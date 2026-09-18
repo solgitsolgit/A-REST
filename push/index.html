@@ -641,42 +641,55 @@
       }
     }
 
-    // 2. 정보 수집 모달에서 [ 확인 ] 클릭 시 -> 데이터 기록(백그라운드) 후 사과 페이지 즉시 표시
+    // 2. 정보 수집 모달에서 [ 확인 ] 클릭 시 -> 0초 즉시 화면 전환 후 백그라운드 전송
     function submitInfoAndReveal() {
       if (!selectedGender || !selectedRegion || !selectedTimeSlot) return;
 
+      // [1] 화면 전환을 0초 딜레이로 가장 먼저 즉각 실행 (지연 0%)
+      closeInfoModal();
+      document.getElementById('revealModal').classList.remove('hidden');
+
+      // [2] 사용자 선택값 세션 저장
       sessionStorage.setItem('arest_user_gender', selectedGender);
       sessionStorage.setItem('arest_user_region', selectedRegion);
       sessionStorage.setItem('arest_user_timeslot', selectedTimeSlot);
 
-      const eventName = currentTrack === 'reserve' ? 'click_reserve' : 'click_purchase';
-      logEvent(eventName, {
-        button: currentTrack,
-        gender: selectedGender,
-        region: selectedRegion,
-        timeSlot: selectedTimeSlot
-      });
+      // [3] 데이터 전송은 화면이 바뀐 뒤 백그라운드 비동기로 실행
+      const track = currentTrack;
+      const gender = selectedGender;
+      const region = selectedRegion;
+      const timeSlot = selectedTimeSlot;
+      const eventName = track === 'reserve' ? 'click_reserve' : 'click_purchase';
 
-      // 정보 수집 모달 닫기 & 사과 페이지 즉시 표시 (지연 없음)
-      closeInfoModal();
-      document.getElementById('revealModal').classList.remove('hidden');
+      setTimeout(function() {
+        logEvent(eventName, {
+          button: track,
+          gender: gender,
+          region: region,
+          timeSlot: timeSlot
+        });
+      }, 0);
     }
 
     function closeApologyModal() {
       document.getElementById('revealModal').classList.add('hidden');
     }
 
-    // 제작자에게 하고싶은 말 전송 후 모달 닫기
+    // 제작자에게 하고싶은 말 전송 후 모달 즉시 닫기
     function submitMessageAndClose() {
       const msgInput = document.getElementById('creatorMessageInput');
       const message = msgInput ? msgInput.value.trim() : '';
 
+      // [1] 팝업창 즉시 닫기
+      closeApologyModal();
+
+      // [2] 한마디 메시지가 있다면 백그라운드 전송
       if (message) {
-        logEvent('user_feedback', { comment: message });
-        alert('소중한 의견 감사합니다! 개발팀에 잘 전달되었습니다. 😊');
+        setTimeout(function() {
+          logEvent('user_feedback', { comment: message });
+        }, 0);
       }
 
-      closeApologyModal();
       if (msgInput) msgInput.value = '';
     }
 
