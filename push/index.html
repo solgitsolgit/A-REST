@@ -641,8 +641,8 @@
       }
     }
 
-    // 2. 정보 수집 모달에서 [ 확인 ] 클릭 시 -> 데이터 기록 후 사과 페이지 표시
-    async function submitInfoAndReveal() {
+    // 2. 정보 수집 모달에서 [ 확인 ] 클릭 시 -> 데이터 기록(백그라운드) 후 사과 페이지 즉시 표시
+    function submitInfoAndReveal() {
       if (!selectedGender || !selectedRegion || !selectedTimeSlot) return;
 
       sessionStorage.setItem('arest_user_gender', selectedGender);
@@ -650,17 +650,15 @@
       sessionStorage.setItem('arest_user_timeslot', selectedTimeSlot);
 
       const eventName = currentTrack === 'reserve' ? 'click_reserve' : 'click_purchase';
-      await logEvent(eventName, {
+      logEvent(eventName, {
         button: currentTrack,
         gender: selectedGender,
         region: selectedRegion,
         timeSlot: selectedTimeSlot
       });
 
-      // 정보 수집 모달 닫기
+      // 정보 수집 모달 닫기 & 사과 페이지 즉시 표시 (지연 없음)
       closeInfoModal();
-
-      // 사과 페이지 표시
       document.getElementById('revealModal').classList.remove('hidden');
     }
 
@@ -669,12 +667,12 @@
     }
 
     // 제작자에게 하고싶은 말 전송 후 모달 닫기
-    async function submitMessageAndClose() {
+    function submitMessageAndClose() {
       const msgInput = document.getElementById('creatorMessageInput');
       const message = msgInput ? msgInput.value.trim() : '';
 
       if (message) {
-        await logEvent('user_feedback', { comment: message });
+        logEvent('user_feedback', { comment: message });
         alert('소중한 의견 감사합니다! 개발팀에 잘 전달되었습니다. 😊');
       }
 
@@ -683,7 +681,7 @@
     }
 
     // 로그 전송 함수 (구글 스프레드시트 실시간 전송 + 로컬 백업)
-    async function logEvent(eventType, details = {}) {
+    function logEvent(eventType, details = {}) {
       const payload = {
         sessionId,
         eventType,
@@ -706,10 +704,10 @@
         localStorage.setItem('arest_local_logs', JSON.stringify(localLogs));
       } catch (e) {}
 
-      // 2. 구글 스프레드시트 웹 앱으로 실시간 전송 (no-cors 전송 + keepalive)
+      // 2. 구글 스프레드시트 웹 앱으로 실시간 백그라운드 전송 (keepalive로 비동기 보장)
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('https://script.google.com/macros/s/')) {
         try {
-          await fetch(GOOGLE_SCRIPT_URL, {
+          fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
             keepalive: true,
