@@ -483,19 +483,35 @@
   </div>
 
   <!-- ================= REVEAL MODAL (준비중 안내 팝업) ================= -->
-  <div id="revealModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-slate-900 border border-teal-500/40 rounded-3xl max-w-md w-full p-8 shadow-2xl relative text-center">
-      <div class="inline-flex p-3.5 rounded-2xl bg-teal-500/10 text-teal-400 text-3xl mb-6 border border-teal-500/20">
+  <div id="revealModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-teal-500/40 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative text-center my-auto">
+      <div class="inline-flex p-3.5 rounded-2xl bg-teal-500/10 text-teal-400 text-3xl mb-4 border border-teal-500/20">
         <i class="fa-solid fa-circle-exclamation"></i>
       </div>
       
       <!-- 사용자 요청 최종 문구 -->
-      <h3 class="text-xl sm:text-2xl font-black text-amber-300 tracking-tight leading-snug mb-8 font-sans">
+      <h3 class="text-xl sm:text-2xl font-black text-amber-300 tracking-tight leading-snug mb-3 font-sans">
         "죄송합니다! 준비중입니다. ㅎㅎ"
       </h3>
+      <p class="text-xs text-slate-300 mb-6 leading-relaxed">
+        더 완성도 높은 자율주행 스마트 휴식 모빌리티를 준비하여 찾아뵙겠습니다.
+      </p>
 
-      <button type="button" onclick="closeApologyModal()" class="w-full py-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-sm tracking-wide transition shadow-lg shadow-teal-500/20 cursor-pointer">
-        확인
+      <!-- 제작자에게 하고싶은 말 입력 칸 -->
+      <div class="mb-6 text-left">
+        <label for="creatorMessageInput" class="block text-xs font-bold text-slate-300 mb-2 font-sans flex items-center justify-between">
+          <span class="flex items-center space-x-1.5">
+            <i class="fa-regular fa-comment-dots text-teal-400"></i>
+            <span>제작자에게 하고 싶은 말 (응원 / 의견 / 건의)</span>
+          </span>
+          <span class="text-[11px] text-teal-400 font-normal">선택사항</span>
+        </label>
+        <textarea id="creatorMessageInput" rows="3" placeholder="서비스에 바라는 점이나 필요한 기능, 응원의 한마디를 자유롭게 남겨주세요!"
+          class="w-full bg-slate-950 border border-slate-700 rounded-xl p-3.5 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-teal-400 resize-none transition font-sans leading-relaxed"></textarea>
+      </div>
+
+      <button type="button" onclick="submitMessageAndClose()" class="w-full py-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-sm tracking-wide transition shadow-lg shadow-teal-500/20 cursor-pointer">
+        완료
       </button>
     </div>
   </div>
@@ -652,6 +668,19 @@
       document.getElementById('revealModal').classList.add('hidden');
     }
 
+    // 제작자에게 하고싶은 말 전송 후 모달 닫기
+    async function submitMessageAndClose() {
+      const msgInput = document.getElementById('creatorMessageInput');
+      const message = msgInput ? msgInput.value.trim() : '';
+
+      if (message) {
+        await logEvent('user_feedback', { comment: message });
+      }
+
+      closeApologyModal();
+      if (msgInput) msgInput.value = '';
+    }
+
     // 로그 전송 함수 (구글 스프레드시트 실시간 전송 + 로컬 백업)
     async function logEvent(eventType, details = {}) {
       const payload = {
@@ -664,6 +693,7 @@
         durationSec: Math.round((Date.now() - pageLoadTime) / 1000),
         referrer: document.referrer || 'Direct/Everytime',
         isAdmin: isAdminDevice,
+        comment: details.comment || '',
         details,
         timestamp: new Date().toISOString()
       };

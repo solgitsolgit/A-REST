@@ -358,6 +358,26 @@
         </div>
       </div>
 
+      <!-- 7. Feedback Feed (제작자에게 남긴 한마디 실시간 모아보기) -->
+      <div class="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-7 shadow-xl">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h4 class="text-base sm:text-lg font-bold text-white font-mono flex items-center space-x-2">
+                <i class="fa-regular fa-comment-dots text-teal-400"></i>
+                <span>💬 제작자에게 남긴 한마디 (참여자 피드백)</span>
+              </h4>
+              <span id="feedbackCountBadge" class="text-[10px] px-2 py-0.5 rounded bg-teal-950 text-teal-300 font-mono font-bold border border-teal-800">0건</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-0.5">팝업 창에서 참여자들이 직접 작성한 의견, 건의사항, 응원 메시지 실시간 목록</p>
+          </div>
+        </div>
+
+        <div id="feedbackListContainer" class="space-y-3">
+          <div class="text-center py-6 text-slate-500 text-xs font-sans">아직 등록된 한마디가 없습니다.</div>
+        </div>
+      </div>
+
     </main>
   </div>
 
@@ -897,6 +917,7 @@
           if (l.eventType === 'page_view') eventBadge = '<span class="text-slate-300 font-medium">입장(PAGE_VIEW)</span>';
           else if (l.eventType === 'click_reserve') eventBadge = '<span class="text-sky-400 font-bold">🥈 Track 1 사전알림 클릭</span>';
           else if (l.eventType === 'click_purchase') eventBadge = '<span class="text-amber-400 font-bold">🥇 Track 2 테스터(5,900원) 클릭</span>';
+          else if (l.eventType === 'user_feedback') eventBadge = '<span class="text-emerald-400 font-bold">💬 한마디 남김</span>';
           else eventBadge = `<span>${l.eventType}</span>`;
 
           const adminTag = l.isAdmin ? ' <span class="text-[10px] text-amber-400 bg-amber-950 px-1.5 py-0.5 rounded border border-amber-800">[관리자]</span>' : '';
@@ -914,6 +935,39 @@
           `;
         }).join('');
       }
+
+      // 7. Render Feedback Messages (제작자에게 남긴 한마디)
+      const allLogs = cachedRawLogs || [];
+      const feedbackLogs = allLogs.filter(l => (l.comment && l.comment.trim()) || l.eventType === 'user_feedback');
+      const countBadge = document.getElementById('feedbackCountBadge');
+      if (countBadge) countBadge.textContent = feedbackLogs.length + '건';
+
+      const fbContainer = document.getElementById('feedbackListContainer');
+      if (fbContainer) {
+        if (feedbackLogs.length === 0) {
+          fbContainer.innerHTML = '<div class="text-center py-6 text-slate-500 text-xs font-sans">아직 등록된 한마디가 없습니다.</div>';
+        } else {
+          fbContainer.innerHTML = feedbackLogs.map(l => {
+            const timeStr = l.timestamp ? new Date(l.timestamp).toLocaleString() : '-';
+            const msg = l.comment || (l.details && l.details.comment) || '-';
+            return `
+              <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 hover:border-slate-700 transition space-y-2 shadow-sm">
+                <div class="flex items-center justify-between flex-wrap gap-1">
+                  <div class="flex items-center space-x-2 text-xs font-mono">
+                    <span class="px-2 py-0.5 rounded bg-teal-950 text-teal-300 font-bold border border-teal-800 font-sans">${l.gender || '미지정'}</span>
+                    <span class="px-2 py-0.5 rounded bg-slate-900 text-slate-300 font-sans">${l.region || '미지정'}</span>
+                    <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-300 font-bold font-sans">${l.timeSlot || '미지정'}</span>
+                  </div>
+                  <span class="text-[11px] text-slate-500 font-mono">${timeStr}</span>
+                </div>
+                <div class="text-sm text-slate-100 font-sans font-medium pl-1 leading-relaxed break-keep">
+                  "${msg}"
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+      }
     }
 
     function downloadCsv() {
@@ -926,10 +980,11 @@
         return;
       }
 
-      let csv = '\uFEFF시간,이벤트구분,세션ID,성별,거주지역,희망시간대,기기,관리자여부\n';
+      let csv = '\uFEFF시간,이벤트구분,세션ID,성별,거주지역,희망시간대,기기,관리자여부,제작자에게남긴한마디\n';
       logs.forEach(l => {
-        const ev = l.eventType === 'click_reserve' ? 'Track 1 (사전알림)' : (l.eventType === 'click_purchase' ? 'Track 2 (테스터)' : '방문 (PAGE_VIEW)');
-        csv += `"${l.timestamp || ''}","${ev}","${l.sessionId || ''}","${l.gender || ''}","${l.region || ''}","${l.timeSlot || ''}","${l.device || ''}","${l.isAdmin ? '관리자' : '일반'}"\n`;
+        let ev = l.eventType === 'click_reserve' ? 'Track 1 (사전알림)' : (l.eventType === 'click_purchase' ? 'Track 2 (테스터)' : (l.eventType === 'user_feedback' ? '제작자에게 한마디' : '방문 (PAGE_VIEW)'));
+        const comment = (l.comment || (l.details && l.details.comment) || '').replace(/"/g, '""');
+        csv += `"${l.timestamp || ''}","${ev}","${l.sessionId || ''}","${l.gender || ''}","${l.region || ''}","${l.timeSlot || ''}","${l.device || ''}","${l.isAdmin ? '관리자' : '일반'}","${comment}"\n`;
       });
 
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
