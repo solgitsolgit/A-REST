@@ -72,8 +72,8 @@ function calculateStats(logs) {
 
   const calcRate = (c, total) => total > 0 ? ((c / total) * 100).toFixed(1) : '0.0';
 
-  // 성별 통계 집계 (남성, 여성, 무성별)
-  const genders = ['남성', '여성', '무성별'];
+  // 성별 통계 집계 (남성, 여성)
+  const genders = ['남성', '여성'];
   const genderStats = {};
   genders.forEach(g => {
     genderStats[g] = {
@@ -85,8 +85,8 @@ function calculateStats(logs) {
     };
   });
 
-  // 지역 통계 집계 (서울, 5도, 이세계)
-  const regions = ['서울', '경기도', '강원도', '충청도', '전라도', '경상도', '이세계'];
+  // 지역 통계 집계 (서울, 5도)
+  const regions = ['서울', '경기도', '강원도', '충청도', '전라도', '경상도'];
   const regionStats = {};
   regions.forEach(r => {
     regionStats[r] = {
@@ -113,7 +113,7 @@ function calculateStats(logs) {
 
   // 각 세션별 성별/지역/시간대 집계
   visitors.forEach(sid => {
-    const demo = sessionDemographics[sid] || { gender: '무성별', region: '서울', timeSlot: '점심' };
+    const demo = sessionDemographics[sid] || { gender: '남성', region: '서울', timeSlot: '점심' };
     const g = demo.gender;
     const r = demo.region;
     const t = demo.timeSlot;
@@ -259,12 +259,12 @@ const server = http.createServer((req, res) => {
     req.on('data', chunk => { body += chunk; });
     req.on('end', () => {
       try {
-        let pin = '1234';
+        let pin = '8888';
         if (body.trim()) {
           const parsed = JSON.parse(body);
           pin = parsed.pin || pin;
         }
-        if (pin === '1234' || pin === 'admin_reset') {
+        if (pin === '8888' || pin === 'admin_reset') {
           saveLogs([]);
           res.writeHead(200, { 'Content-Type': 'application/json' });
           res.end(JSON.stringify({ success: true, message: '데이터가 0으로 초기화되었습니다.' }));
@@ -340,6 +340,6 @@ server.listen(PORT, () => {
   console.log(`🚌 [수면버스] 서버가 성공적으로 실행되었습니다!`);
   console.log(`🌐 방문자용 랜딩페이지: http://localhost:${PORT}`);
   console.log(`🔐 비밀 관리자 대시보드: http://localhost:${PORT}/admin.html`);
-  console.log(`🔑 기본 관리자 비밀번호: 1234`);
+  console.log(`🔑 기본 관리자 비밀번호: 8888`);
   console.log(`====================================================`);
 });

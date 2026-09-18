@@ -45,13 +45,13 @@
 <body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-teal-500 selection:text-slate-950">
 
   <!-- Top Institutional Bar -->
-  <div class="border-b border-slate-800/80 bg-slate-900/80 text-[12px] text-slate-300 py-1.5 px-4 backdrop-blur">
+  <div class="border-b border-slate-800/80 bg-slate-900/80 text-[11px] sm:text-[12px] text-slate-300 py-1.5 px-3 sm:px-4 backdrop-blur">
     <div class="max-w-5xl mx-auto flex items-center justify-between font-mono">
-      <div class="flex items-center space-x-2">
-        <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
-        <span class="font-medium text-slate-200">AUTONOMOUS REST MOBILITY RESEARCH · FOT 1.0</span>
+      <div class="flex items-center space-x-2 truncate">
+        <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse shrink-0"></span>
+        <span class="font-medium text-slate-200 truncate text-[11px] sm:text-[12px]">A-REST CAMPUS MOBILITY · FOT 1.0</span>
       </div>
-      <div class="hidden sm:flex items-center space-x-2 text-slate-400">
+      <div class="hidden sm:flex items-center space-x-2 text-slate-400 shrink-0">
         <span>PROJECT CODE:</span>
         <span class="text-teal-300 font-bold bg-slate-800 px-2 py-0.5 rounded border border-slate-700">AML-REST-2026</span>
       </div>
@@ -60,25 +60,25 @@
 
   <!-- Navigation Bar -->
   <nav class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/90 shadow-md">
-    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center space-x-3">
-        <div class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 font-black text-xl shadow-inner">
+    <div class="max-w-5xl mx-auto px-3.5 sm:px-4 h-14 sm:h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-2.5 sm:space-x-3 min-w-0">
+        <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 font-black text-base sm:text-xl shadow-inner shrink-0">
           <i class="fa-solid fa-microchip"></i>
         </div>
-        <div>
-          <div class="font-extrabold text-lg tracking-tight text-white flex items-center space-x-2">
+        <div class="min-w-0">
+          <div class="font-extrabold text-base sm:text-lg tracking-tight text-white flex items-center space-x-1.5 sm:space-x-2">
             <span>A-REST</span>
-            <span class="text-[11px] px-2 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-800 font-mono font-bold">Level 4 FOT</span>
+            <span class="text-[10px] sm:text-[11px] px-1.5 sm:px-2 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-800 font-mono font-bold">Level 4 FOT</span>
           </div>
-          <p class="text-[11px] text-slate-300 tracking-normal">자율주행 스마트 휴식 모빌리티 연구소</p>
+          <p class="text-[10px] sm:text-[11px] text-slate-300 tracking-normal truncate">자율주행 스마트 휴식 모빌리티 연구소</p>
         </div>
       </div>
       
-      <div class="flex items-center space-x-2 text-xs font-mono">
-        <span id="userDemoTag" class="px-3 py-1 rounded-full bg-teal-950/80 border border-teal-700 text-teal-300 font-bold hidden sm:inline-block">
+      <div class="flex items-center space-x-2 text-xs font-mono shrink-0">
+        <span id="userDemoTag" class="px-2.5 py-1 rounded-full bg-teal-950/80 border border-teal-700 text-teal-300 font-bold hidden sm:inline-block text-[11px]">
           참여자 정보 확인 중
         </span>
-        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-slate-300 font-medium">
+        <span class="hidden md:inline-block px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-slate-300 font-medium text-xs">
           전국 대학교 캠퍼스 실증
         </span>
       </div>
@@ -86,24 +86,25 @@
   </nav>
 
   <!-- Hero Section -->
-  <header class="pt-14 pb-20 px-4 relative grid-pattern border-b border-slate-800/80">
+  <header class="pt-8 sm:pt-14 pb-12 sm:pb-20 px-4 relative grid-pattern border-b border-slate-800/80">
     <div class="max-w-4xl mx-auto text-center relative z-10">
       
       <!-- Research Badge -->
-      <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-slate-900 border border-teal-500/40 text-teal-300 text-xs font-mono font-medium mb-6 shadow-sm">
-        <i class="fa-solid fa-satellite-dish text-[11px]"></i>
-        <span>2026 전국 대학 캠퍼스 이동형 수면·휴식 포드 현장 실증(FOT)</span>
+      <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-teal-500/40 text-teal-300 text-[11px] sm:text-xs font-mono font-medium mb-5 sm:mb-6 shadow-sm max-w-full">
+        <i class="fa-solid fa-satellite-dish text-[10px] sm:text-[11px] shrink-0"></i>
+        <span class="hidden sm:inline">2026 전국 대학 캠퍼스 이동형 수면·휴식 포드 현장 실증(FOT)</span>
+        <span class="sm:hidden truncate">2026 캠퍼스 수면·휴식 포드 실증 (FOT)</span>
       </div>
 
       <!-- Headline (High Readability) -->
-      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight sm:leading-tight mb-6">
+      <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-white leading-snug sm:leading-tight mb-4 sm:mb-6 break-keep">
         캠퍼스 거점 자율주행 플랫폼 기반<br/>
         <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-sky-200 to-indigo-200 font-black">
           개인 맞춤형 스마트 휴식 캡슐 (A-Pod)
         </span>
       </h1>
 
-      <p class="text-base sm:text-lg text-slate-200 max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
+      <p class="text-sm sm:text-base md:text-lg text-slate-200 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10 font-normal break-keep">
         원거리 이동 없이 <strong>공학·자연계 연구동</strong>, <strong>중앙도서관</strong> 등 전국 대학 주요 거점에서 온디맨드로 정차하는 
         <strong>Level 4 자율주행 모빌리티 내부 프라이빗 휴식 캡슐</strong>입니다.<br class="hidden sm:block"/>
         전국 대학생의 교내 휴식 인프라 부재 문제를 해결하기 위한 연구소의 1차 현장 실증 세션을 진행합니다.
@@ -404,7 +405,7 @@
         선택하신 세션 신청 및 배차 알림을 위해 아래 정보를 선택해 주세요.
       </p>
 
-      <!-- 1. 성별 선택 (남성, 여성, 무성별) -->
+      <!-- 1. 성별 선택 (남성, 여성) -->
       <div class="mb-5">
         <div class="flex items-center justify-between mb-2">
           <label class="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
@@ -412,20 +413,17 @@
           </label>
           <span id="infoGenderNotice" class="text-[11px] text-teal-400 font-mono font-medium">선택 필요</span>
         </div>
-        <div class="grid grid-cols-3 gap-2.5">
+        <div class="grid grid-cols-2 gap-2.5">
           <button type="button" onclick="selectGender('남성')" id="info-gender-남성" class="gender-btn py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm font-bold text-slate-200 hover:border-teal-500/60 transition text-center shadow-sm">
             남성
           </button>
           <button type="button" onclick="selectGender('여성')" id="info-gender-여성" class="gender-btn py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm font-bold text-slate-200 hover:border-teal-500/60 transition text-center shadow-sm">
             여성
           </button>
-          <button type="button" onclick="selectGender('무성별')" id="info-gender-무성별" class="gender-btn py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm font-bold text-slate-200 hover:border-teal-500/60 transition text-center shadow-sm">
-            무성별
-          </button>
         </div>
       </div>
 
-      <!-- 2. 지역 선택 (서울, 경기도, 강원도, 충청도, 전라도, 경상도, 이세계) - '이세계' 버튼도 다른 항목과 동일하게 통일 -->
+      <!-- 2. 지역 선택 (서울, 경기도, 강원도, 충청도, 전라도, 경상도) -->
       <div class="mb-5">
         <div class="flex items-center justify-between mb-2">
           <label class="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
@@ -433,7 +431,7 @@
           </label>
           <span id="infoRegionNotice" class="text-[11px] text-teal-400 font-mono font-medium">선택 필요</span>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs sm:text-sm font-medium">
+        <div class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs sm:text-sm font-medium">
           <button type="button" onclick="selectRegion('서울')" id="info-region-서울" class="region-btn py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 hover:border-teal-500/60 transition text-center font-bold shadow-sm">
             서울
           </button>
@@ -451,9 +449,6 @@
           </button>
           <button type="button" onclick="selectRegion('경상도')" id="info-region-경상도" class="region-btn py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 hover:border-teal-500/60 transition text-center font-bold shadow-sm">
             경상도
-          </button>
-          <button type="button" onclick="selectRegion('이세계')" id="info-region-이세계" class="region-btn py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 hover:border-teal-500/60 transition text-center font-bold shadow-sm">
-            이세계
           </button>
         </div>
       </div>
@@ -487,16 +482,16 @@
     </div>
   </div>
 
-  <!-- ================= REVEAL MODAL (사과 팝업 - 요청 문구만 단독 표시) ================= -->
+  <!-- ================= REVEAL MODAL (준비중 안내 팝업) ================= -->
   <div id="revealModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-slate-900 border border-teal-500/40 rounded-3xl max-w-md w-full p-8 shadow-2xl relative text-center">
       <div class="inline-flex p-3.5 rounded-2xl bg-teal-500/10 text-teal-400 text-3xl mb-6 border border-teal-500/20">
         <i class="fa-solid fa-circle-exclamation"></i>
       </div>
       
-      <!-- 사용자 요청 필수 문구 -->
+      <!-- 사용자 요청 최종 문구 -->
       <h3 class="text-xl sm:text-2xl font-black text-amber-300 tracking-tight leading-snug mb-8 font-sans">
-        "죄송합니다. 일개 대학생이 data를 수집하기 위해 만든 홈페이지 입니다"
+        "죄송합니다! 준비중입니다."
       </h3>
 
       <button type="button" onclick="closeApologyModal()" class="w-full py-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-sm tracking-wide transition shadow-lg shadow-teal-500/20 cursor-pointer">
@@ -513,6 +508,12 @@
 
   <!-- Telemetry & Interaction Script -->
   <script>
+    // =========================================================================
+    // 📊 [구글 스프레드시트 실시간 데이터 수집 연동 URL]
+    // Apps Script 배포 후 생성된 웹 앱 URL을 아래에 넣으면 구글 시트에 실시간 자동 기록됩니다.
+    // =========================================================================
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-6VU42elNFyhHbA-GIoa_Ur5KuIp4LZdPm2PaHMK7G9ABVNqDCOYBRmweHR8BHg0v8A/exec';
+
     let currentTrack = null;
     let selectedGender = sessionStorage.getItem('arest_user_gender') || null;
     let selectedRegion = sessionStorage.getItem('arest_user_region') || null;
@@ -651,7 +652,7 @@
       document.getElementById('revealModal').classList.add('hidden');
     }
 
-    // 로그 전송 함수 (관리자 기기 자동 배제 포함)
+    // 로그 전송 함수 (구글 스프레드시트 실시간 전송 + 로컬 백업)
     async function logEvent(eventType, details = {}) {
       const payload = {
         sessionId,
@@ -667,21 +668,35 @@
         timestamp: new Date().toISOString()
       };
 
+      // 1. 브라우저 로컬 저장소 백업
       try {
         const localLogs = JSON.parse(localStorage.getItem('arest_local_logs') || '[]');
         localLogs.push(payload);
         localStorage.setItem('arest_local_logs', JSON.stringify(localLogs));
       } catch (e) {}
 
+      // 2. 구글 스프레드시트 웹 앱으로 실시간 전송 (no-cors 전송)
+      if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('https://script.google.com/macros/s/')) {
+        try {
+          fetch(GOOGLE_SCRIPT_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload)
+          }).catch(() => {});
+        } catch (err) {
+          console.warn('Google Sheet log error:', err);
+        }
+      }
+
+      // 3. 로컬 테스트 서버(node server.js) 백업
       try {
-        await fetch('/api/log', {
+        fetch('/api/log', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json; charset=utf-8' },
           body: JSON.stringify(payload)
-        });
-      } catch (err) {
-        console.log('Telemetry saved locally');
-      }
+        }).catch(() => {});
+      } catch (err) {}
     }
 
     // 페이지 진입 시: 아무런 차단 창 없이 즉시 열람 및 page_view 로깅
