@@ -528,7 +528,7 @@
     // 📊 [구글 스프레드시트 실시간 데이터 수집 연동 URL]
     // Apps Script 배포 후 생성된 웹 앱 URL을 아래에 넣으면 구글 시트에 실시간 자동 기록됩니다.
     // =========================================================================
-    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-6VU42elNFyhHbA-GIoa_Ur5KuIp4LZdPm2PaHMK7G9ABVNqDCOYBRmweHR8BHg0v8A/exec';
+    const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyOB8WIC5gzAejslvFzAHxASM-Od3rYjWDae5oE3UKhe8aZCncS2oTCcHXdPD_bzAfX/exec';
 
     let currentTrack = null;
     let selectedGender = sessionStorage.getItem('arest_user_gender') || null;
@@ -675,6 +675,7 @@
 
       if (message) {
         await logEvent('user_feedback', { comment: message });
+        alert('소중한 의견 감사합니다! 개발팀에 잘 전달되었습니다. 😊');
       }
 
       closeApologyModal();
@@ -705,12 +706,13 @@
         localStorage.setItem('arest_local_logs', JSON.stringify(localLogs));
       } catch (e) {}
 
-      // 2. 구글 스프레드시트 웹 앱으로 실시간 전송 (no-cors 전송)
+      // 2. 구글 스프레드시트 웹 앱으로 실시간 전송 (no-cors 전송 + keepalive)
       if (GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL.startsWith('https://script.google.com/macros/s/')) {
         try {
-          fetch(GOOGLE_SCRIPT_URL, {
+          await fetch(GOOGLE_SCRIPT_URL, {
             method: 'POST',
             mode: 'no-cors',
+            keepalive: true,
             headers: { 'Content-Type': 'text/plain;charset=utf-8' },
             body: JSON.stringify(payload)
           }).catch(() => {});
