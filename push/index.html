@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A-REST Mobility Lab | 캠퍼스 자율주행 스마트 휴식 모빌리티 실증 연구</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tech: {
+              400: '#2dd4bf',
+              500: '#14b8a6',
+              600: '#0d9488',
+              900: '#134e4a',
+            }
+          },
+          fontFamily: {
+            sans: ['Pretendard', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Consolas', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: 'Pretendard', sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+    .grid-pattern {
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-teal-500 selection:text-slate-950">
+
+  <!-- Top Institutional Bar -->
+  <div class="border-b border-slate-800/80 bg-slate-900/80 text-[12px] text-slate-300 py-1.5 px-4 backdrop-blur">
+    <div class="max-w-5xl mx-auto flex items-center justify-between font-mono">
+      <div class="flex items-center space-x-2">
+        <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+        <span class="font-medium text-slate-200">AUTONOMOUS REST MOBILITY RESEARCH · FOT 1.0</span>
+      </div>
+      <div class="hidden sm:flex items-center space-x-2 text-slate-400">
+        <span>PROJECT CODE:</span>
+        <span class="text-teal-300 font-bold bg-slate-800 px-2 py-0.5 rounded border border-slate-700">AML-REST-2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <nav class="sticky top-0 z-40 bg-slate-950/90 backdrop-blur-md border-b border-slate-800/90 shadow-md">
+    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 font-black text-xl shadow-inner">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+        <div>
+          <div class="font-extrabold text-lg tracking-tight text-white flex items-center space-x-2">
+            <span>A-REST</span>
+            <span class="text-[11px] px-2 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-800 font-mono font-bold">Level 4 FOT</span>
+          </div>
+          <p class="text-[11px] text-slate-300 tracking-normal">자율주행 스마트 휴식 모빌리티 연구소</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-2 text-xs font-mono">
+        <span id="userDemoTag" class="px-3 py-1 rounded-full bg-teal-950/80 border border-teal-700 text-teal-300 font-bold hidden sm:inline-block">
+          참여자 정보 확인 중
+        </span>
+        <span class="px-3 py-1 rounded-full bg-slate-900 border border-slate-700 text-slate-300 font-medium">
+          전국 대학교 캠퍼스 실증
+        </span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="pt-14 pb-20 px-4 relative grid-pattern border-b border-slate-800/80">
+    <div class="max-w-4xl mx-auto text-center relative z-10">
+      
+      <!-- Research Badge -->
+      <div class="inline-flex items-center space-x-2 px-4 py-1.5 rounded-full bg-slate-900 border border-teal-500/40 text-teal-300 text-xs font-mono font-medium mb-6 shadow-sm">
+        <i class="fa-solid fa-satellite-dish text-[11px]"></i>
+        <span>2026 전국 대학 캠퍼스 이동형 수면·휴식 포드 현장 실증(FOT)</span>
+      </div>
+
+      <!-- Headline (High Readability) -->
+      <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight sm:leading-tight mb-6">
+        캠퍼스 거점 자율주행 플랫폼 기반<br/>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-300 via-sky-200 to-indigo-200 font-black">
+          개인 맞춤형 스마트 휴식 캡슐 (A-Pod)
+        </span>
+      </h1>
+
+      <p class="text-base sm:text-lg text-slate-200 max-w-2xl mx-auto leading-relaxed mb-10 font-normal">
+        원거리 이동 없이 <strong>공학·자연계 연구동</strong>, <strong>중앙도서관</strong> 등 전국 대학 주요 거점에서 온디맨드로 정차하는 
+        <strong>Level 4 자율주행 모빌리티 내부 프라이빗 휴식 캡슐</strong>입니다.<br class="hidden sm:block"/>
+        전국 대학생의 교내 휴식 인프라 부재 문제를 해결하기 위한 연구소의 1차 현장 실증 세션을 진행합니다.
+      </p>
+
+      <!-- Action Box / CTA Grid -->
+      <div class="max-w-xl mx-auto grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Track 1 CTA -->
+        <button onclick="handleCtaClick('reserve')" class="px-5 py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 border border-teal-500/50 hover:border-teal-400 text-left transition group shadow-xl">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[11px] font-mono text-teal-400 font-bold uppercase tracking-wider">Track 1 · 사전등록</span>
+            <i class="fa-solid fa-arrow-right text-xs text-slate-400 group-hover:text-teal-300 transition-transform group-hover:translate-x-1"></i>
+          </div>
+          <div class="text-base font-bold text-white mb-1">실증 운행 알림 등록</div>
+          <p class="text-xs text-slate-300">정식 실증 오픈 시 실시간 정차 알림 (0원)</p>
+        </button>
+
+        <!-- Track 2 CTA -->
+        <button onclick="handleCtaClick('purchase')" class="px-5 py-4 rounded-2xl bg-gradient-to-r from-teal-600 to-emerald-600 hover:from-teal-500 hover:to-emerald-500 text-left transition group shadow-xl shadow-teal-950/50">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[11px] font-mono text-teal-100 font-bold uppercase tracking-wider">Track 2 · 테스터 참여</span>
+            <span class="text-[11px] bg-teal-950 text-teal-200 px-2.5 py-0.5 rounded-full font-mono font-bold">5,900원</span>
+          </div>
+          <div class="text-base font-bold text-white mb-1">30분 집중 휴식 세션 참여</div>
+          <p class="text-xs text-teal-100">연구 참여 테스터 지원가 (선착순 30명)</p>
+        </button>
+      </div>
+
+      <div class="mt-8 text-xs font-mono text-slate-400 flex items-center justify-center space-x-4">
+        <span><i class="fa-solid fa-shield-halved text-teal-400 mr-1.5"></i>데이터 수집 윤리 준수</span>
+        <span>•</span>
+        <span><i class="fa-solid fa-location-crosshairs text-teal-400 mr-1.5"></i>전국 대학 캠퍼스 실증 운행</span>
+      </div>
+
+      <!-- Prototype Image Preview Card -->
+      <div class="mt-10 max-w-4xl mx-auto rounded-3xl overflow-hidden border border-slate-700/80 bg-slate-900 shadow-2xl relative text-left">
+        <div class="bg-slate-950/90 border-b border-slate-800 px-5 py-3 flex items-center justify-between font-mono text-xs text-slate-300">
+          <div class="flex items-center space-x-2">
+            <span class="w-2.5 h-2.5 rounded-full bg-teal-400 animate-pulse"></span>
+            <span class="font-bold text-white tracking-wide">A-REST 실증 1호차 프로토타입</span>
+            <span class="text-[10px] px-2 py-0.5 rounded bg-teal-950 text-teal-300 border border-teal-800 hidden sm:inline font-bold">캠퍼스 거점 투입형</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-mono hidden sm:block">
+            Level 4 Autonomous Pod & Private Rest Cabin
+          </div>
+        </div>
+
+        <div class="relative group overflow-hidden bg-slate-950">
+          <!-- 1. Top Floating Badges (각각 좌측 50% 외부 사진, 우측 50% 내부 사진 상단에 정확히 배치) -->
+          <div class="absolute top-3 left-3 sm:top-4 sm:left-5 z-10">
+            <span class="px-3 py-1.5 rounded-xl bg-slate-950/85 border border-teal-500/60 text-teal-300 font-bold text-xs flex items-center space-x-1.5 shadow-xl backdrop-blur-md">
+              <i class="fa-solid fa-car-side text-xs text-teal-400"></i>
+              <span>외부 (Exterior)</span>
+            </span>
+          </div>
+
+          <div class="absolute top-3 left-[calc(50%+0.75rem)] sm:top-4 sm:left-[calc(50%+1.25rem)] z-10">
+            <span class="px-3 py-1.5 rounded-xl bg-slate-950/85 border border-indigo-400/60 text-indigo-300 font-bold text-xs flex items-center space-x-1.5 shadow-xl backdrop-blur-md">
+              <i class="fa-solid fa-bed text-xs text-indigo-300"></i>
+              <span>내부 (Interior)</span>
+            </span>
+          </div>
+
+          <!-- Main Image -->
+          <img src="bus image.png" onerror="this.src='bus-image.png'" alt="A-REST 자율주행 스마트 휴식 모빌리티 외관 및 프라이빗 수면 캡슐 내부" class="w-full h-auto object-cover transition-transform duration-700 group-hover:scale-[1.01]" />
+          
+          <!-- 2. Bottom 50/50 Split Overlay Bar (좌/우 각 사진 영역에 1:1 완벽 정렬) -->
+          <div class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-transparent pt-12 pb-3.5 sm:pb-5 px-3 sm:px-6">
+            <div class="grid grid-cols-2 gap-2.5 sm:gap-5 w-full">
+              
+              <!-- 좌측 50%: 외부 (Exterior) 상세 정보 -->
+              <div class="p-2 sm:p-3 rounded-2xl bg-slate-950/85 border border-teal-500/40 backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 shadow-lg">
+                <div class="flex items-center space-x-1.5 sm:space-x-2">
+                  <span class="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-teal-500/25 text-teal-300 font-bold border border-teal-500/50 text-[11px] sm:text-xs flex items-center space-x-1 shadow-sm flex-shrink-0">
+                    <i class="fa-solid fa-car-side text-[10px] sm:text-xs"></i>
+                    <span>외부</span>
+                  </span>
+                  <span class="text-white text-xs sm:text-sm font-bold tracking-tight truncate">캠퍼스 자율 순환 스마트 포드</span>
+                </div>
+                <span class="text-slate-400 text-[10px] font-mono hidden lg:inline">Level 4 Autonomous</span>
+              </div>
+
+              <!-- 우측 50%: 내부 (Interior) 상세 정보 -->
+              <div class="p-2 sm:p-3 rounded-2xl bg-slate-950/85 border border-indigo-500/40 backdrop-blur-md flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1 shadow-lg">
+                <div class="flex items-center space-x-1.5 sm:space-x-2">
+                  <span class="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-lg bg-indigo-500/25 text-indigo-300 font-bold border border-indigo-500/50 text-[11px] sm:text-xs flex items-center space-x-1 shadow-sm flex-shrink-0">
+                    <i class="fa-solid fa-bed text-[10px] sm:text-xs"></i>
+                    <span>내부</span>
+                  </span>
+                  <span class="text-white text-xs sm:text-sm font-bold tracking-tight truncate">1인 전용 무중력 수면 캡슐</span>
+                </div>
+                <span class="text-slate-400 text-[10px] font-mono hidden lg:inline">Private Sleep Cabin</span>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Problem Context Section -->
+  <section class="py-16 px-4 max-w-4xl mx-auto">
+    <div class="text-center mb-12">
+      <span class="text-xs font-mono font-bold uppercase tracking-widest text-teal-400">Problem & Context</span>
+      <h2 class="text-2xl sm:text-3xl font-bold mt-2 text-white">교내 고강도 학업 환경과 휴식 공간 부재</h2>
+      <p class="text-sm text-slate-300 mt-2">캠퍼스 구성원의 생체 피로도 해소를 위한 정량적 모빌리티 실증 필요성</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+      <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-sm">
+        <div class="text-teal-400 font-mono text-xs font-bold mb-2">#01. 공간 인프라 불균형</div>
+        <h3 class="font-bold text-base text-white mb-2">공학관 등 고지대 휴식 공간 소멸</h3>
+        <p class="text-slate-300 leading-relaxed text-xs">
+          전국 대학 주요 학업 시설 내 지정 수면실 부재 및 열람실 좌식 수면으로 인한 근골격계 피로 누적.
+        </p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-sm">
+        <div class="text-teal-400 font-mono text-xs font-bold mb-2">#02. 높은 이동 비용</div>
+        <h3 class="font-bold text-base text-white mb-2">외부 상설 수면 시설의 한계</h3>
+        <p class="text-slate-300 leading-relaxed text-xs">
+          교외 수면카페 이용 시 왕복 50분 이상의 이동 시간 소요 및 회당 1만 원 이상의 높은 비용 장벽.
+        </p>
+      </div>
+
+      <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl shadow-sm">
+        <div class="text-teal-400 font-mono text-xs font-bold mb-2">#03. 환경 제어 부재</div>
+        <h3 class="font-bold text-base text-white mb-2">도서관·과방의 소음 및 조도</h3>
+        <p class="text-slate-300 leading-relaxed text-xs">
+          개방된 공간 특성상 조도, 소음, 온습도 조절이 불가능하여 단시간 수면의 질(Sleep Efficiency) 저하.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Technical Specifications -->
+  <section class="py-16 px-4 bg-slate-900/50 border-y border-slate-800/80">
+    <div class="max-w-4xl mx-auto">
+      <div class="text-center mb-12">
+        <span class="text-xs font-mono font-bold uppercase tracking-widest text-teal-400">Engineering Specs</span>
+        <h2 class="text-2xl sm:text-3xl font-bold mt-2 text-white">A-REST 모빌리티 탑재 시스템 명세</h2>
+        <p class="text-sm text-slate-300 mt-2">자율주행 플랫폼과 인체공학적 독립 캡슐의 통합 설계</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Spec 1 -->
+        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 flex items-start space-x-4 shadow">
+          <div class="w-11 h-11 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fa-solid fa-cubes"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-base text-white">독립 차음 캡슐 & 180° 전동 리클라이너</h4>
+            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+              무중력 자세(Zero-Gravity Position)를 구현하는 180도 전동 시트와 탄소섬유 차음 격벽을 통한 완벽한 프라이버시 보장.
+            </p>
+          </div>
+        </div>
+
+        <!-- Spec 2 -->
+        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 flex items-start space-x-4 shadow">
+          <div class="w-11 h-11 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fa-solid fa-lungs"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-base text-white">산소 농도 23% 제어 & 스마트 HVAC</h4>
+            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+              실내 산소 농도 23% 유지 및 22℃ 항온 공조 시스템. 미세먼지 차단 HEPA 필터 및 생체 리듬 안정 디퓨저.
+            </p>
+          </div>
+        </div>
+
+        <!-- Spec 3 -->
+        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 flex items-start space-x-4 shadow">
+          <div class="w-11 h-11 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fa-solid fa-volume-xmark"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-base text-white">능동형 소음제어(ANC) & 바이노럴 비트</h4>
+            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+              차량 주행음 및 외부 소음 차단을 위한 액티브 노이즈 캔슬링과 뇌파 안정화(알파파/세타파) 사운드 솔루션.
+            </p>
+          </div>
+        </div>
+
+        <!-- Spec 4 -->
+        <div class="p-6 rounded-2xl bg-slate-900 border border-slate-800 flex items-start space-x-4 shadow">
+          <div class="w-11 h-11 rounded-xl bg-teal-500/10 border border-teal-500/30 text-teal-400 flex items-center justify-center text-lg flex-shrink-0">
+            <i class="fa-solid fa-car-side"></i>
+          </div>
+          <div>
+            <h4 class="font-bold text-base text-white">Level 4 자율 순환 & 거점 온디맨드 대기</h4>
+            <p class="text-xs text-slate-300 mt-1.5 leading-relaxed">
+              LiDAR-Camera 멀티센서 융합 기반 교내 도로 자율 순환. 피크 타임대 단과대 연구동, 중앙도서관 고정 대기 및 스마트 예약 호출.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Route & Stations -->
+  <section class="py-16 px-4 max-w-4xl mx-auto">
+    <div class="text-center mb-10">
+      <span class="text-xs font-mono font-bold uppercase tracking-widest text-teal-400">Deployment Route</span>
+      <h2 class="text-2xl sm:text-3xl font-bold mt-2 text-white">1차 실증 거점 (전국 주요 대학 캠퍼스)</h2>
+    </div>
+
+    <div class="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-xl">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800">
+          <div class="text-teal-400 font-mono font-bold text-xs mb-1">STATION A (거점 1)</div>
+          <div class="text-base font-bold text-white mb-1">공학관 / 이공계 연구동 앞</div>
+          <p class="text-slate-300 text-xs">주간 상시 대기 거점 (피로도 집중 구역)</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800">
+          <div class="text-teal-400 font-mono font-bold text-xs mb-1">STATION B (거점 2)</div>
+          <div class="text-base font-bold text-white mb-1">중앙도서관 후문 광장</div>
+          <p class="text-slate-300 text-xs">시험 및 집중 열람 시간대 대기</p>
+        </div>
+        <div class="p-5 rounded-2xl bg-slate-950 border border-slate-800">
+          <div class="text-teal-400 font-mono font-bold text-xs mb-1">STATION C (거점 3)</div>
+          <div class="text-base font-bold text-white mb-1">학생회관 / 중앙 광장</div>
+          <p class="text-slate-300 text-xs">공강 시간 단기 온디맨드 호출</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA Section -->
+  <section class="py-16 px-4 bg-slate-900/60 border-t border-slate-800">
+    <div class="max-w-3xl mx-auto text-center">
+      <h2 class="text-2xl sm:text-3xl font-bold mt-2 mb-3 text-white">1차 현장 실증 세션 참여 등록</h2>
+      <p class="text-sm text-slate-300 mb-10">참여 데이터는 모빌리티 최적 거점 배치 및 휴식 효율성 분석에 활용됩니다.</p>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 text-left">
+        <!-- Option 1 -->
+        <div class="bg-slate-900 p-6 sm:p-7 rounded-3xl border border-slate-800 flex flex-col justify-between shadow-lg">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold">Track 1</span>
+              <span class="text-xs text-teal-400 font-mono font-bold">사전 알림</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-1.5">실증 운행 알림 등록</h3>
+            <p class="text-xs text-slate-300 mb-6">시범 운행 시작 및 캠퍼스 정차 일정 실시간 SMS 알림</p>
+            <div class="text-2xl font-black text-white mb-6 font-mono">0원 <span class="text-xs text-slate-400 font-normal">(실증 오픈 50% 할인 코드)</span></div>
+          </div>
+          <button onclick="handleCtaClick('reserve')" class="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-750 border border-slate-700 hover:border-teal-400 text-white font-bold text-sm tracking-wide transition">
+            실증 알림 등록하기
+          </button>
+        </div>
+
+        <!-- Option 2 -->
+        <div class="bg-slate-900 p-6 sm:p-7 rounded-3xl border-2 border-teal-500/80 flex flex-col justify-between shadow-2xl relative">
+          <div class="absolute -top-3.5 right-5 bg-teal-400 text-slate-950 text-xs font-mono font-black px-3 py-0.5 rounded-full uppercase tracking-wider shadow">
+            30명 한정 얼리버드 특가
+          </div>
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <span class="text-xs font-mono px-2.5 py-0.5 rounded-full bg-teal-950 text-teal-300 font-semibold border border-teal-800">Track 2</span>
+              <span class="text-xs text-teal-400 font-mono font-bold">얼리버드 세션</span>
+            </div>
+            <h3 class="text-xl font-bold text-white mb-1.5">30분 집중 휴식 세션 테스터</h3>
+            <p class="text-xs text-slate-300 mb-6">독립 캡슐 30분 실증 탑승 및 생체 리프레시 테스트 세션</p>
+            <div class="text-2xl font-black text-white mb-6 font-mono">
+              5,900원 <span class="text-xs text-slate-400 line-through font-normal">정가 30,000원</span>
+            </div>
+          </div>
+          <button onclick="handleCtaClick('purchase')" class="w-full py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-sm tracking-wide transition shadow-lg shadow-teal-500/20">
+            테스터 세션 구매 및 참여하기 (5,900원)
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer (No admin links!) -->
+  <footer class="py-10 px-4 text-center text-xs font-mono text-slate-400 border-t border-slate-900 bg-slate-950">
+    <p class="mb-1 text-slate-300">CAMUS · CAMPUS AUTONOMOUS MOBILITY & REST RESEARCH INITIATIVE</p>
+    <p class="text-slate-400">교내 휴식 복지 및 자율주행 모빌리티 실증 연구 데이터 수집 프로젝트</p>
+  </footer>
+
+  <!-- ================= INFO MODAL (Track 1 or Track 2 클릭 시 정보 수집) ================= -->
+  <div id="infoModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4 overflow-y-auto">
+    <div class="bg-slate-900 border border-teal-500/40 rounded-3xl max-w-md w-full p-6 sm:p-8 shadow-2xl relative text-left my-auto">
+      
+      <!-- Close icon -->
+      <button type="button" onclick="closeInfoModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-200 transition text-lg cursor-pointer">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center space-x-2 text-teal-400 font-mono text-xs font-bold uppercase mb-2">
+        <span class="w-2 h-2 rounded-full bg-teal-400 animate-pulse"></span>
+        <span id="infoModalBadge">A-REST 실증 연구 · 참여 신청</span>
+      </div>
+      <h2 class="text-xl sm:text-2xl font-black text-white mb-1.5" id="infoModalTitle">실증 참여 정보 입력</h2>
+      <p class="text-xs sm:text-sm text-slate-300 mb-6 leading-relaxed">
+        선택하신 세션 신청 및 배차 알림을 위해 아래 정보를 선택해 주세요.
+      </p>
+
+      <!-- 1. 성별 선택 (남성, 여성, 무성별) -->
+      <div class="mb-5">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
+            1. 성별
+          </label>
+          <span id="infoGenderNotice" class="text-[11px] text-teal-400 font-mono font-medium">선택 필요</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2.5">
+          <button type="button" onclick="selectGender('남성')" id="info-gender-남성" class="gender-btn py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm font-bold text-slate-200 hover:border-teal-500/60 transition text-center shadow-sm">
+            남성
+          </button>
+          <button type="button" onclick="selectGender('여성')" id="info-gender-여성" class="gender-btn py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm font-bold text-slate-200 hover:border-teal-500/60 transition text-center shadow-sm">
+            여성
+          </button>
+          <button type="button" onclick="selectGender('무성별')" id="info-gender-무성별" class="gender-btn py-3 rounded-xl bg-slate-950 border border-slate-800 text-sm font-bold text-slate-200 hover:border-teal-500/60 transition text-center shadow-sm">
+            무성별
+          </button>
+        </div>
+      </div>
+
+      <!-- 2. 지역 선택 (서울, 경기도, 강원도, 충청도, 전라도, 경상도, 이세계) - '이세계' 버튼도 다른 항목과 동일하게 통일 -->
+      <div class="mb-5">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
+            2. 거주 / 활동 지역
+          </label>
+          <span id="infoRegionNotice" class="text-[11px] text-teal-400 font-mono font-medium">선택 필요</span>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs sm:text-sm font-medium">
+          <button type="button" onclick="selectRegion('서울')" id="info-region-서울" class="region-btn py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 hover:border-teal-500/60 transition text-center font-bold shadow-sm">
+            서울
+          </button>
+          <button type="button" onclick="selectRegion('경기도')" id="info-region-경기도" class="region-btn py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 hover:border-teal-500/60 transition text-center font-bold shadow-sm">
+            경기도
+          </button>
+          <button type="button" onclick="selectRegion('강원도')" id="info-region-강원도" class="region-btn py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 hover:border-teal-500/60 transition text-center font-bold shadow-sm">
+            강원도
+          </button>
+          <button type="button" onclick="selectRegion('충청도')" id="info-region-충청도" class="region-btn py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 hover:border-teal-500/60 transition text-center font-bold shadow-sm">
+            충청도
+          </button>
+          <button type="button" onclick="selectRegion('전라도')" id="info-region-전라도" class="region-btn py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 hover:border-teal-500/60 transition text-center font-bold shadow-sm">
+            전라도
+          </button>
+          <button type="button" onclick="selectRegion('경상도')" id="info-region-경상도" class="region-btn py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 hover:border-teal-500/60 transition text-center font-bold shadow-sm">
+            경상도
+          </button>
+          <button type="button" onclick="selectRegion('이세계')" id="info-region-이세계" class="region-btn py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 hover:border-teal-500/60 transition text-center font-bold shadow-sm">
+            이세계
+          </button>
+        </div>
+      </div>
+
+      <!-- 3. 주 이용 희망 시간대 (아침, 점심, 저녁) -->
+      <div class="mb-7">
+        <div class="flex items-center justify-between mb-2">
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
+            3. 희망 이용 시간대
+          </label>
+          <span id="infoTimeNotice" class="text-[11px] text-teal-400 font-mono font-medium">선택 필요</span>
+        </div>
+        <div class="grid grid-cols-3 gap-2.5">
+          <button type="button" onclick="selectTimeSlot('아침')" id="info-time-아침" class="time-btn py-3 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm font-bold text-slate-200 hover:border-teal-500/60 transition text-center shadow-sm">
+            🌅 아침 <span class="block text-[10px] font-normal text-slate-400 font-mono mt-0.5">07~11시</span>
+          </button>
+          <button type="button" onclick="selectTimeSlot('점심')" id="info-time-점심" class="time-btn py-3 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm font-bold text-slate-200 hover:border-teal-500/60 transition text-center shadow-sm">
+            ☀️ 점심 <span class="block text-[10px] font-normal text-slate-400 font-mono mt-0.5">11~17시</span>
+          </button>
+          <button type="button" onclick="selectTimeSlot('저녁')" id="info-time-저녁" class="time-btn py-3 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm font-bold text-slate-200 hover:border-teal-500/60 transition text-center shadow-sm">
+            🌙 저녁 <span class="block text-[10px] font-normal text-slate-400 font-mono mt-0.5">17~23시</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 확인 버튼 -->
+      <button type="button" id="submitInfoBtn" onclick="submitInfoAndReveal()" disabled
+        class="w-full py-4 rounded-xl bg-slate-800 text-slate-400 font-bold text-sm tracking-wider uppercase transition cursor-not-allowed">
+        항목을 모두 선택해 주세요
+      </button>
+    </div>
+  </div>
+
+  <!-- ================= REVEAL MODAL (사과 팝업 - 요청 문구만 단독 표시) ================= -->
+  <div id="revealModal" class="fixed inset-0 z-50 hidden bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-teal-500/40 rounded-3xl max-w-md w-full p-8 shadow-2xl relative text-center">
+      <div class="inline-flex p-3.5 rounded-2xl bg-teal-500/10 text-teal-400 text-3xl mb-6 border border-teal-500/20">
+        <i class="fa-solid fa-circle-exclamation"></i>
+      </div>
+      
+      <!-- 사용자 요청 필수 문구 -->
+      <h3 class="text-xl sm:text-2xl font-black text-amber-300 tracking-tight leading-snug mb-8 font-sans">
+        "죄송합니다. 일개 대학생이 data를 수집하기 위해 만든 홈페이지 입니다"
+      </h3>
+
+      <button type="button" onclick="closeApologyModal()" class="w-full py-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-sm tracking-wide transition shadow-lg shadow-teal-500/20 cursor-pointer">
+        확인
+      </button>
+    </div>
+  </div>
+
+  <!-- 관리자 기기 식별 배지 (일반 사용자에겐 안 보임) -->
+  <div id="adminDeviceBadge" class="fixed bottom-3 right-3 bg-amber-950/95 border border-amber-500/80 text-amber-300 text-xs font-mono px-3.5 py-1.5 rounded-xl shadow-2xl z-50 hidden flex items-center space-x-1.5">
+    <i class="fa-solid fa-shield-halved text-amber-400"></i>
+    <span>관리자 기기 (통계 집계 제외 모드)</span>
+  </div>
+
+  <!-- Telemetry & Interaction Script -->
+  <script>
+    let currentTrack = null;
+    let selectedGender = sessionStorage.getItem('arest_user_gender') || null;
+    let selectedRegion = sessionStorage.getItem('arest_user_region') || null;
+    let selectedTimeSlot = sessionStorage.getItem('arest_user_timeslot') || null;
+
+    function getSessionId() {
+      let sid = localStorage.getItem('arest_session_id');
+      if (!sid) {
+        sid = 's_' + Math.random().toString(36).substr(2, 9);
+        localStorage.setItem('arest_session_id', sid);
+      }
+      return sid;
+    }
+
+    const sessionId = getSessionId();
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    const pageLoadTime = Date.now();
+    const isAdminDevice = localStorage.getItem('arest_is_admin_device') === 'true';
+
+    // 1. Track 1 또는 Track 2 버튼 클릭 시 정보 수집 모달 오픈
+    function handleCtaClick(actionType) {
+      currentTrack = actionType;
+      
+      const badge = document.getElementById('infoModalBadge');
+      const title = document.getElementById('infoModalTitle');
+      if (actionType === 'reserve') {
+        if (badge) badge.textContent = 'Track 1 · 실증 운행 알림 등록 (0원)';
+        if (title) title.textContent = '실증 알림 정보 입력';
+      } else {
+        if (badge) badge.textContent = 'Track 2 · 30분 집중 휴식 세션 테스터 (5,900원)';
+        if (title) title.textContent = '테스터 참여 정보 입력';
+      }
+
+      // 기존 선택값 복원
+      if (selectedGender) selectGender(selectedGender);
+      if (selectedRegion) selectRegion(selectedRegion);
+      if (selectedTimeSlot) selectTimeSlot(selectedTimeSlot);
+
+      checkInfoReady();
+      document.getElementById('infoModal').classList.remove('hidden');
+    }
+
+    function closeInfoModal() {
+      document.getElementById('infoModal').classList.add('hidden');
+    }
+
+    // 성별 선택 핸들러
+    function selectGender(gender) {
+      selectedGender = gender;
+      document.querySelectorAll('.gender-btn').forEach(btn => {
+        btn.classList.remove('bg-teal-500', 'border-teal-400', 'text-slate-950', 'shadow-teal-500/20');
+        btn.classList.add('bg-slate-950', 'border-slate-800', 'text-slate-200');
+      });
+      const target = document.getElementById('info-gender-' + gender);
+      if (target) {
+        target.classList.remove('bg-slate-950', 'border-slate-800', 'text-slate-200');
+        target.classList.add('bg-teal-500', 'border-teal-400', 'text-slate-950', 'shadow-teal-500/20');
+      }
+      const notice = document.getElementById('infoGenderNotice');
+      if (notice) notice.textContent = '✓ ' + gender;
+      checkInfoReady();
+    }
+
+    // 지역 선택 핸들러 (이세계 포함 모두 동일한 스타일)
+    function selectRegion(region) {
+      selectedRegion = region;
+      document.querySelectorAll('.region-btn').forEach(btn => {
+        btn.classList.remove('bg-teal-500', 'border-teal-400', 'text-slate-950', 'shadow-teal-500/20');
+        btn.classList.add('bg-slate-950', 'border-slate-800', 'text-slate-200');
+      });
+      const target = document.getElementById('info-region-' + region);
+      if (target) {
+        target.classList.remove('bg-slate-950', 'border-slate-800', 'text-slate-200');
+        target.classList.add('bg-teal-500', 'border-teal-400', 'text-slate-950', 'shadow-teal-500/20');
+      }
+      const notice = document.getElementById('infoRegionNotice');
+      if (notice) notice.textContent = '✓ ' + region;
+      checkInfoReady();
+    }
+
+    // 시간대 선택 핸들러
+    function selectTimeSlot(slot) {
+      selectedTimeSlot = slot;
+      document.querySelectorAll('.time-btn').forEach(btn => {
+        btn.classList.remove('bg-teal-500', 'border-teal-400', 'text-slate-950', 'shadow-teal-500/20');
+        btn.classList.add('bg-slate-950', 'border-slate-800', 'text-slate-200');
+      });
+      const target = document.getElementById('info-time-' + slot);
+      if (target) {
+        target.classList.remove('bg-slate-950', 'border-slate-800', 'text-slate-200');
+        target.classList.add('bg-teal-500', 'border-teal-400', 'text-slate-950', 'shadow-teal-500/20');
+      }
+      const notice = document.getElementById('infoTimeNotice');
+      if (notice) notice.textContent = '✓ ' + slot;
+      checkInfoReady();
+    }
+
+    // 3개 항목 모두 선택 여부 확인
+    function checkInfoReady() {
+      const btn = document.getElementById('submitInfoBtn');
+      if (selectedGender && selectedRegion && selectedTimeSlot) {
+        btn.disabled = false;
+        btn.className = 'w-full py-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-sm tracking-wider uppercase transition cursor-pointer shadow-lg shadow-teal-500/25';
+        btn.textContent = '확인';
+      } else {
+        btn.disabled = true;
+        btn.className = 'w-full py-4 rounded-xl bg-slate-800 text-slate-400 font-bold text-sm tracking-wider uppercase transition cursor-not-allowed';
+        btn.textContent = '항목을 모두 선택해 주세요';
+      }
+    }
+
+    // 2. 정보 수집 모달에서 [ 확인 ] 클릭 시 -> 데이터 기록 후 사과 페이지 표시
+    async function submitInfoAndReveal() {
+      if (!selectedGender || !selectedRegion || !selectedTimeSlot) return;
+
+      sessionStorage.setItem('arest_user_gender', selectedGender);
+      sessionStorage.setItem('arest_user_region', selectedRegion);
+      sessionStorage.setItem('arest_user_timeslot', selectedTimeSlot);
+
+      const eventName = currentTrack === 'reserve' ? 'click_reserve' : 'click_purchase';
+      await logEvent(eventName, {
+        button: currentTrack,
+        gender: selectedGender,
+        region: selectedRegion,
+        timeSlot: selectedTimeSlot
+      });
+
+      // 정보 수집 모달 닫기
+      closeInfoModal();
+
+      // 사과 페이지 표시
+      document.getElementById('revealModal').classList.remove('hidden');
+    }
+
+    function closeApologyModal() {
+      document.getElementById('revealModal').classList.add('hidden');
+    }
+
+    // 로그 전송 함수 (관리자 기기 자동 배제 포함)
+    async function logEvent(eventType, details = {}) {
+      const payload = {
+        sessionId,
+        eventType,
+        gender: selectedGender || '미지정',
+        region: selectedRegion || '미지정',
+        timeSlot: selectedTimeSlot || '미지정',
+        device: isMobile ? 'Mobile' : 'Desktop',
+        durationSec: Math.round((Date.now() - pageLoadTime) / 1000),
+        referrer: document.referrer || 'Direct/Everytime',
+        isAdmin: isAdminDevice,
+        details,
+        timestamp: new Date().toISOString()
+      };
+
+      try {
+        const localLogs = JSON.parse(localStorage.getItem('arest_local_logs') || '[]');
+        localLogs.push(payload);
+        localStorage.setItem('arest_local_logs', JSON.stringify(localLogs));
+      } catch (e) {}
+
+      try {
+        await fetch('/api/log', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json; charset=utf-8' },
+          body: JSON.stringify(payload)
+        });
+      } catch (err) {
+        console.log('Telemetry saved locally');
+      }
+    }
+
+    // 페이지 진입 시: 아무런 차단 창 없이 즉시 열람 및 page_view 로깅
+    window.addEventListener('DOMContentLoaded', () => {
+      if (isAdminDevice) {
+        document.getElementById('adminDeviceBadge')?.classList.remove('hidden');
+      }
+      logEvent('page_view');
+    });
+  </script>
+</body>
+</html>

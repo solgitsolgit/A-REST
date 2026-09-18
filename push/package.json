@@ -1,0 +1,15 @@
+{
+  "name": "a-rest-sleepbus",
+  "version": "1.0.0",
+  "description": "A-REST 자율주행 스마트 휴식 모빌리티 실증 데이터 수집 시스템",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

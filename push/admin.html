@@ -1,0 +1,975 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>A-REST Mobility Lab | 연구 통계 관리 시스템</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css');
+    body {
+      font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen selection:bg-teal-500 selection:text-slate-950">
+
+  <!-- ================= 1. PASSWORD GATEWAY ================= -->
+  <div id="authGate" class="fixed inset-0 z-50 bg-slate-950 flex items-center justify-center p-4">
+    <div class="bg-slate-900 border border-slate-800 p-8 rounded-3xl max-w-sm w-full shadow-2xl text-center">
+      <div class="w-14 h-14 bg-teal-500/10 text-teal-400 rounded-2xl flex items-center justify-center text-2xl mx-auto mb-4 border border-teal-500/20">
+        <i class="fa-solid fa-lock"></i>
+      </div>
+      <div class="text-[11px] font-mono text-teal-400 font-bold uppercase tracking-wider mb-1">A-REST LAB SECURE ACCESS</div>
+      <h2 class="text-xl font-bold text-white mb-1">연구 책임자 인증</h2>
+      <p class="text-xs text-slate-300 mb-6">A-REST 자율주행 모빌리티 실증 관제 시스템</p>
+
+      <form onsubmit="handleAuth(event)" class="space-y-4">
+        <div>
+          <input type="password" id="pinInput" placeholder="관리자 PIN 입력 (기본: 1234)" autofocus
+            class="w-full text-center tracking-widest text-lg bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 focus:outline-none focus:border-teal-500 text-white placeholder-slate-400 font-mono">
+        </div>
+        <div id="authError" class="text-xs text-rose-400 font-medium hidden">
+          인증 코드가 올바르지 않습니다.
+        </div>
+        <button type="submit" class="w-full py-3.5 rounded-xl bg-teal-500 hover:bg-teal-400 font-bold text-xs tracking-wider uppercase text-slate-950 shadow transition">
+          대시보드 접속
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ================= 2. DASHBOARD MAIN VIEW ================= -->
+  <div id="dashboardView" class="hidden">
+    <!-- Admin Top Bar -->
+    <header class="bg-slate-900/90 backdrop-blur border-b border-slate-800 sticky top-0 z-30">
+      <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-9 h-9 rounded-lg bg-teal-500/10 border border-teal-500/30 flex items-center justify-center text-teal-400 text-sm">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="font-extrabold text-sm sm:text-base tracking-tight text-white font-mono">A-REST DATA CONTROL</span>
+              <span class="text-[10px] px-2 py-0.5 rounded bg-teal-950 text-teal-300 font-mono font-bold border border-teal-800">FOT Telemetry</span>
+            </div>
+            <p class="text-[11px] text-slate-300">자율주행 스마트 휴식 모빌리티 수요 실증 통계</p>
+          </div>
+        </div>
+
+        <div class="flex items-center space-x-2">
+          <!-- 관리자 방문 제외 토글 -->
+          <button onclick="toggleAdminFilter()" id="adminFilterToggleBtn" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-800 border border-teal-800 text-xs font-semibold text-teal-300 flex items-center space-x-1.5 transition" title="관리자 기기 트래픽 제외 여부 설정">
+            <i class="fa-solid fa-shield-halved text-[11px] text-teal-400"></i>
+            <span id="adminFilterText" class="hidden md:inline">내 방문 집계 제외: ON</span>
+            <span class="md:hidden">제외: ON</span>
+          </button>
+
+          <!-- 상단 고정 눈에 띄는 데이터 초기화 버튼 -->
+          <button onclick="resetDataImmediately()" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-rose-600 hover:bg-rose-500 text-xs font-bold text-white flex items-center space-x-1.5 transition shadow shadow-rose-900/50" title="전체 데이터 0으로 초기화">
+            <i class="fa-solid fa-trash-can text-[11px]"></i>
+            <span class="hidden sm:inline">데이터 0으로 초기화</span>
+            <span class="sm:hidden">초기화</span>
+          </button>
+
+          <button onclick="fetchStats()" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-750 text-xs font-semibold text-slate-200 border border-slate-700 flex items-center space-x-1.5 transition">
+            <i class="fa-solid fa-rotate-right text-[11px]"></i>
+            <span class="hidden sm:inline">새로고침</span>
+          </button>
+          
+          <button onclick="downloadCsv()" class="px-2.5 sm:px-3 py-1.5 rounded-lg bg-teal-500 hover:bg-teal-400 text-xs font-bold text-slate-950 flex items-center space-x-1.5 transition shadow">
+            <i class="fa-solid fa-file-arrow-down text-[11px]"></i>
+            <span class="hidden sm:inline">CSV 다운로드</span>
+            <span class="sm:hidden">CSV</span>
+          </button>
+          
+          <button onclick="handleLogout()" class="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-rose-950/40 text-slate-400 hover:text-rose-400 text-xs transition" title="로그아웃">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Body -->
+    <main class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+
+      <!-- 0. Track Filter Switcher (전체 vs Track 1 vs Track 2 분리 보기) -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-2.5 sm:p-3 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xl backdrop-blur">
+        <div class="flex items-center space-x-2 text-xs font-bold text-slate-300 px-2">
+          <i class="fa-solid fa-layer-group text-teal-400"></i>
+          <span>분석 대상 트랙 선택:</span>
+        </div>
+        <div class="grid grid-cols-3 gap-1.5 w-full sm:w-auto" id="trackFilterGroup">
+          <button onclick="setTrackFilter('all')" id="btnFilterAll" class="px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 bg-teal-500 text-slate-950 shadow">
+            <span>📊 전체 통합</span>
+          </button>
+          <button onclick="setTrackFilter('track1')" id="btnFilterTrack1" class="px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-750">
+            <span>🥈 Track 1 (0원)</span>
+          </button>
+          <button onclick="setTrackFilter('track2')" id="btnFilterTrack2" class="px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-750">
+            <span>🥇 Track 2 (5,900원)</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- 1. Hypothesis Status Banner -->
+      <div id="hypothesisCard" class="p-6 sm:p-7 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl transition-all">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <div id="hypothesisSubtitle" class="text-xs font-mono font-bold text-teal-400 uppercase tracking-wider mb-1">
+              XYZ 가설 검증 기준 판정 (실증 목표 기준 X = 10%)
+            </div>
+            <h3 class="text-2xl sm:text-3xl font-black text-white flex flex-wrap items-center gap-3">
+              <span id="hypothesisTitleLabel">종합 클릭 전환율:</span>
+              <span id="totalRateText" class="text-teal-400 font-mono">0.0%</span>
+              <span id="validationBadge" class="text-xs px-3.5 py-1 rounded-full bg-slate-800 text-slate-400 font-bold border border-slate-700">
+                실증 데이터 수집 대기
+              </span>
+            </h3>
+            <p id="hypothesisDesc" class="text-xs sm:text-sm text-slate-300 mt-2">
+              "전체 고유 방문자 대비 적어도 10% 이상이 사전등록 또는 테스터 구매 버튼을 클릭하면 가설 통과(될 놈)."
+            </p>
+          </div>
+
+          <!-- Quick Progress Bar -->
+          <div class="w-full md:w-72 bg-slate-950 rounded-full h-4 p-0.5 overflow-hidden border border-slate-800">
+            <div id="conversionProgressBar" class="bg-teal-500 h-full rounded-full transition-all duration-700" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Overall KPI Cards Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 font-mono">
+        <!-- UV Card -->
+        <div id="kpiCardUV" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow transition-all">
+          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-2 font-sans">
+            <span>총 고유 방문자 (UV)</span>
+            <i class="fa-solid fa-users text-teal-400"></i>
+          </div>
+          <div class="text-4xl font-black text-white" id="statUV">0</div>
+          <div class="text-xs text-slate-300 mt-1.5 font-sans">성별·지역 선택 후 입장 인원</div>
+        </div>
+
+        <!-- Reserve Card (Track 1) -->
+        <div id="kpiCardTrack1" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow transition-all cursor-pointer hover:border-slate-700" onclick="setTrackFilter('track1')">
+          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-2 font-sans">
+            <span class="flex items-center space-x-1.5">
+              <span>🥈 사전 알림 클릭 (Track 1)</span>
+              <span id="badgeT1Selected" class="hidden text-[10px] px-1.5 py-0.5 rounded bg-sky-500/20 text-sky-300 font-bold border border-sky-500/40">분석중</span>
+            </span>
+            <i class="fa-solid fa-bell text-sky-400"></i>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span class="text-4xl font-black text-white" id="statReserveClicks">0</span>
+            <span class="text-base font-bold text-sky-400" id="statReserveRate">0.0%</span>
+          </div>
+          <div class="text-xs text-slate-300 mt-1.5 font-sans">목표: 20% 이상 (0원 관심도)</div>
+        </div>
+
+        <!-- Purchase Card (Track 2) -->
+        <div id="kpiCardTrack2" class="bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow transition-all cursor-pointer hover:border-slate-700" onclick="setTrackFilter('track2')">
+          <div class="flex items-center justify-between text-slate-400 text-xs font-semibold mb-2 font-sans">
+            <span class="flex items-center space-x-1.5">
+              <span>🥇 테스터 구매 클릭 (Track 2)</span>
+              <span id="badgeT2Selected" class="hidden text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40">분석중</span>
+            </span>
+            <i class="fa-solid fa-credit-card text-amber-400"></i>
+          </div>
+          <div class="flex items-baseline space-x-2">
+            <span class="text-4xl font-black text-white" id="statPurchaseClicks">0</span>
+            <span class="text-base font-bold text-amber-400" id="statPurchaseRate">0.0%</span>
+          </div>
+          <div class="text-xs text-slate-300 mt-1.5 font-sans">목표: 5% 이상 (실제 5,900원 지불의사)</div>
+        </div>
+      </div>
+
+      <!-- 3. Demographic Section: 성별별 클릭 통계 (남성, 여성, 무성별) -->
+      <div class="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-7 shadow-xl">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h4 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-venus-mars text-teal-400"></i>
+              <span>성별별 클릭 통계 <span id="genderTrackLabel" class="text-xs font-normal text-teal-300 ml-1"></span></span>
+            </h4>
+            <p class="text-xs text-slate-300 mt-0.5">각 성별 방문자 수 대비 버튼 클릭 전환율 비교 (Track 1 & Track 2 분리 집계)</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono" id="genderCardsGrid">
+          <!-- 남성 카드 -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow">
+            <div class="flex items-center justify-between text-xs text-slate-300 mb-1 font-sans">
+              <span class="font-bold text-white text-sm">남성</span>
+              <span id="maleRate" class="text-teal-400 font-mono font-bold text-base">0.0%</span>
+            </div>
+            <div class="text-xl font-black text-white" id="maleCounts">0명 중 0명 클릭</div>
+            <div class="w-full bg-slate-800 rounded-full h-2 mt-3 overflow-hidden">
+              <div id="maleBar" class="bg-teal-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mt-3 pt-2.5 border-t border-slate-800/80 font-mono" id="maleTrackSub">
+              <span>🥈 T1: <b class="text-sky-400">0.0%</b> (0명)</span>
+              <span>🥇 T2: <b class="text-amber-400">0.0%</b> (0명)</span>
+            </div>
+          </div>
+
+          <!-- 여성 카드 -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow">
+            <div class="flex items-center justify-between text-xs text-slate-300 mb-1 font-sans">
+              <span class="font-bold text-white text-sm">여성</span>
+              <span id="femaleRate" class="text-sky-400 font-mono font-bold text-base">0.0%</span>
+            </div>
+            <div class="text-xl font-black text-white" id="femaleCounts">0명 중 0명 클릭</div>
+            <div class="w-full bg-slate-800 rounded-full h-2 mt-3 overflow-hidden">
+              <div id="femaleBar" class="bg-sky-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mt-3 pt-2.5 border-t border-slate-800/80 font-mono" id="femaleTrackSub">
+              <span>🥈 T1: <b class="text-sky-400">0.0%</b> (0명)</span>
+              <span>🥇 T2: <b class="text-amber-400">0.0%</b> (0명)</span>
+            </div>
+          </div>
+
+          <!-- 무성별 카드 -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow">
+            <div class="flex items-center justify-between text-xs text-slate-300 mb-1 font-sans">
+              <span class="font-bold text-white text-sm">무성별</span>
+              <span id="nonbinaryRate" class="text-amber-400 font-mono font-bold text-base">0.0%</span>
+            </div>
+            <div class="text-xl font-black text-white" id="nonbinaryCounts">0명 중 0명 클릭</div>
+            <div class="w-full bg-slate-800 rounded-full h-2 mt-3 overflow-hidden">
+              <div id="nonbinaryBar" class="bg-amber-500 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mt-3 pt-2.5 border-t border-slate-800/80 font-mono" id="nonbinaryTrackSub">
+              <span>🥈 T1: <b class="text-sky-400">0.0%</b> (0명)</span>
+              <span>🥇 T2: <b class="text-amber-400">0.0%</b> (0명)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Demographic Section: 지역별 클릭 통계 (서울, 5도, 이세계) -->
+      <div class="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-7 shadow-xl">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h4 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-map-location-dot text-teal-400"></i>
+              <span>지역별 클릭 통계 (서울 · 5도 · 이세계) <span id="regionTrackLabel" class="text-xs font-normal text-teal-300 ml-1"></span></span>
+            </h4>
+            <p class="text-xs text-slate-300 mt-0.5">전국 및 이세계 권역별 수요 및 Track 1 / Track 2 전환율 비교</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 font-mono" id="regionCardsGrid">
+          <!-- 동적 렌더링 -->
+        </div>
+      </div>
+
+      <!-- 5. Demographic Section: 희망 이용 시간대별 수요 분석 (아침, 점심, 저녁) -->
+      <div class="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-7 shadow-xl">
+        <div class="flex items-center justify-between mb-5">
+          <div>
+            <h4 class="text-base sm:text-lg font-bold text-white flex items-center space-x-2">
+              <i class="fa-solid fa-clock text-amber-400"></i>
+              <span>희망 이용 시간대별 수요 분석 (아침 · 점심 · 저녁) <span id="timeSlotTrackLabel" class="text-xs font-normal text-teal-300 ml-1"></span></span>
+            </h4>
+            <p class="text-xs text-slate-300 mt-0.5">참여자 희망 시간대별 수면버스 클릭 전환율 및 수요 분포</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 font-mono" id="timeSlotCardsGrid">
+          <!-- 아침 카드 -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow">
+            <div class="flex items-center justify-between text-xs text-slate-300 mb-1 font-sans">
+              <span class="font-bold text-white text-sm flex items-center space-x-1.5">
+                <span>🌅</span>
+                <span>아침 (07:00 ~ 11:00)</span>
+              </span>
+              <span id="morningRate" class="text-amber-400 font-mono font-bold text-base">0.0%</span>
+            </div>
+            <div class="text-xl font-black text-white" id="morningCounts">0명 중 0명 클릭</div>
+            <div class="w-full bg-slate-800 rounded-full h-2 mt-3 overflow-hidden">
+              <div id="morningBar" class="bg-amber-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mt-3 pt-2.5 border-t border-slate-800/80 font-mono" id="morningTrackSub">
+              <span>🥈 T1: <b class="text-sky-400">0.0%</b> (0명)</span>
+              <span>🥇 T2: <b class="text-amber-400">0.0%</b> (0명)</span>
+            </div>
+          </div>
+
+          <!-- 점심 카드 -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow">
+            <div class="flex items-center justify-between text-xs text-slate-300 mb-1 font-sans">
+              <span class="font-bold text-white text-sm flex items-center space-x-1.5">
+                <span>☀️</span>
+                <span>점심 (11:00 ~ 17:00)</span>
+              </span>
+              <span id="lunchRate" class="text-teal-400 font-mono font-bold text-base">0.0%</span>
+            </div>
+            <div class="text-xl font-black text-white" id="lunchCounts">0명 중 0명 클릭</div>
+            <div class="w-full bg-slate-800 rounded-full h-2 mt-3 overflow-hidden">
+              <div id="lunchBar" class="bg-teal-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mt-3 pt-2.5 border-t border-slate-800/80 font-mono" id="lunchTrackSub">
+              <span>🥈 T1: <b class="text-sky-400">0.0%</b> (0명)</span>
+              <span>🥇 T2: <b class="text-amber-400">0.0%</b> (0명)</span>
+            </div>
+          </div>
+
+          <!-- 저녁 카드 -->
+          <div class="bg-slate-950 p-5 rounded-2xl border border-slate-800 shadow">
+            <div class="flex items-center justify-between text-xs text-slate-300 mb-1 font-sans">
+              <span class="font-bold text-white text-sm flex items-center space-x-1.5">
+                <span>🌙</span>
+                <span>저녁 (17:00 ~ 23:00)</span>
+              </span>
+              <span id="eveningRate" class="text-purple-400 font-mono font-bold text-base">0.0%</span>
+            </div>
+            <div class="text-xl font-black text-white" id="eveningCounts">0명 중 0명 클릭</div>
+            <div class="w-full bg-slate-800 rounded-full h-2 mt-3 overflow-hidden">
+              <div id="eveningBar" class="bg-purple-400 h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mt-3 pt-2.5 border-t border-slate-800/80 font-mono" id="eveningTrackSub">
+              <span>🥈 T1: <b class="text-sky-400">0.0%</b> (0명)</span>
+              <span>🥇 T2: <b class="text-amber-400">0.0%</b> (0명)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Raw Event Telemetry Stream -->
+      <div class="bg-slate-900 rounded-3xl border border-slate-800 p-6 sm:p-7 shadow-xl">
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div class="flex items-center space-x-2">
+              <h4 class="text-base sm:text-lg font-bold text-white font-mono">📋 REAL-TIME TELEMETRY LOGS (최근 50건)</h4>
+              <span id="logFilterBadge" class="text-[10px] px-2 py-0.5 rounded bg-teal-950 text-teal-300 font-mono font-bold border border-teal-800">전체 로그</span>
+            </div>
+            <p class="text-xs text-slate-300 mt-0.5">성별·지역·희망시간 정보가 포함된 실시간 클릭 스트림</p>
+          </div>
+          <button onclick="resetDataImmediately()" class="text-xs text-rose-400 hover:text-rose-300 underline font-medium cursor-pointer">
+            테스트 데이터 초기화 (0으로 리셋)
+          </button>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-left text-xs font-mono">
+            <thead class="text-slate-300 bg-slate-950 uppercase border-b border-slate-800 text-xs font-semibold">
+              <tr>
+                <th class="py-3 px-4">시간</th>
+                <th class="py-3 px-4">이벤트</th>
+                <th class="py-3 px-4">성별</th>
+                <th class="py-3 px-4">지역</th>
+                <th class="py-3 px-4">희망시간</th>
+                <th class="py-3 px-4">기기</th>
+                <th class="py-3 px-4">세션</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody" class="divide-y divide-slate-800/80 text-xs">
+              <tr>
+                <td colspan="7" class="py-8 text-center text-slate-400 font-sans">기록된 이벤트가 없습니다.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <!-- JavaScript Logic -->
+  <script>
+    const ADMIN_PIN = '1234';
+    let cachedStats = null;
+    let currentTrackFilter = 'all'; // 'all' | 'track1' | 'track2'
+
+    function handleAuth(e) {
+      e.preventDefault();
+      const pin = document.getElementById('pinInput').value;
+      if (pin === ADMIN_PIN) {
+        sessionStorage.setItem('arest_admin_auth', 'true');
+        showDashboard();
+      } else {
+        document.getElementById('authError').classList.remove('hidden');
+      }
+    }
+
+    function handleLogout() {
+      sessionStorage.removeItem('arest_admin_auth');
+      location.reload();
+    }
+
+    function checkAuth() {
+      if (sessionStorage.getItem('arest_admin_auth') === 'true') {
+        showDashboard();
+      }
+    }
+
+    function showDashboard() {
+      if (localStorage.getItem('arest_is_admin_device') === null) {
+        localStorage.setItem('arest_is_admin_device', 'true');
+      }
+      updateFilterButtonUI();
+
+      document.getElementById('authGate').classList.add('hidden');
+      document.getElementById('dashboardView').classList.remove('hidden');
+      fetchStats();
+      setInterval(fetchStats, 5000);
+    }
+
+    function setTrackFilter(filter) {
+      currentTrackFilter = filter;
+
+      const btnAll = document.getElementById('btnFilterAll');
+      const btnT1 = document.getElementById('btnFilterTrack1');
+      const btnT2 = document.getElementById('btnFilterTrack2');
+
+      const inactiveClass = 'px-3.5 sm:px-4 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center space-x-1.5 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-750';
+
+      if (btnAll) {
+        btnAll.className = filter === 'all'
+          ? 'px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 bg-teal-500 text-slate-950 shadow'
+          : inactiveClass;
+      }
+
+      if (btnT1) {
+        btnT1.className = filter === 'track1'
+          ? 'px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 bg-sky-500 text-slate-950 shadow'
+          : inactiveClass;
+      }
+
+      if (btnT2) {
+        btnT2.className = filter === 'track2'
+          ? 'px-3.5 sm:px-4 py-2 rounded-xl text-xs font-bold transition flex items-center justify-center space-x-1.5 bg-amber-500 text-slate-950 shadow'
+          : inactiveClass;
+      }
+
+      if (cachedStats) {
+        renderStats(cachedStats);
+      }
+    }
+
+    async function fetchStats() {
+      try {
+        const res = await fetch('/api/stats');
+        if (res.ok) {
+          const data = await res.json();
+          cachedStats = data;
+          renderStats(data);
+          return;
+        }
+      } catch (e) {
+        console.log('Using local fallback');
+      }
+      renderFromLocalStorage();
+    }
+
+    function renderFromLocalStorage() {
+      const logs = JSON.parse(localStorage.getItem('arest_local_logs') || '[]');
+      const publicLogs = logs.filter(item => item.isAdmin !== true && item.isAdmin !== 'true');
+
+      const visitors = new Set();
+      let reserveClicks = 0;
+      let purchaseClicks = 0;
+      const reserveUsers = new Set();
+      const purchaseUsers = new Set();
+
+      const sessionDemographics = {};
+      publicLogs.forEach(item => {
+        if (item.sessionId) {
+          visitors.add(item.sessionId);
+          if (!sessionDemographics[item.sessionId]) {
+            sessionDemographics[item.sessionId] = { gender: '미지정', region: '미지정', timeSlot: '미지정' };
+          }
+          if (item.gender && item.gender !== '미지정') {
+            sessionDemographics[item.sessionId].gender = item.gender;
+          }
+          if (item.region && item.region !== '미지정') {
+            sessionDemographics[item.sessionId].region = item.region;
+          }
+          if (item.timeSlot && item.timeSlot !== '미지정') {
+            sessionDemographics[item.sessionId].timeSlot = item.timeSlot;
+          }
+        }
+        if (item.eventType === 'click_reserve') {
+          reserveClicks++;
+          if (item.sessionId) reserveUsers.add(item.sessionId);
+        } else if (item.eventType === 'click_purchase') {
+          purchaseClicks++;
+          if (item.sessionId) purchaseUsers.add(item.sessionId);
+        }
+      });
+
+      const convertedUsers = new Set([...reserveUsers, ...purchaseUsers]);
+      const calcRate = (c, total) => total > 0 ? ((c / total) * 100).toFixed(1) : '0.0';
+
+      const genders = ['남성', '여성', '무성별'];
+      const genderStats = {};
+      genders.forEach(g => {
+        genderStats[g] = {
+          uv: 0,
+          converted: 0,
+          rate: '0.0',
+          track1: { converted: 0, rate: '0.0' },
+          track2: { converted: 0, rate: '0.0' }
+        };
+      });
+
+      const regions = ['서울', '경기도', '강원도', '충청도', '전라도', '경상도', '이세계'];
+      const regionStats = {};
+      regions.forEach(r => {
+        regionStats[r] = {
+          uv: 0,
+          converted: 0,
+          rate: '0.0',
+          track1: { converted: 0, rate: '0.0' },
+          track2: { converted: 0, rate: '0.0' }
+        };
+      });
+
+      const timeSlots = ['아침', '점심', '저녁'];
+      const timeSlotStats = {};
+      timeSlots.forEach(t => {
+        timeSlotStats[t] = {
+          uv: 0,
+          converted: 0,
+          rate: '0.0',
+          track1: { converted: 0, rate: '0.0' },
+          track2: { converted: 0, rate: '0.0' }
+        };
+      });
+
+      visitors.forEach(sid => {
+        const demo = sessionDemographics[sid] || { gender: '무성별', region: '서울', timeSlot: '점심' };
+        const g = demo.gender;
+        const r = demo.region;
+        const t = demo.timeSlot;
+
+        if (genderStats[g]) genderStats[g].uv++;
+        if (regionStats[r]) regionStats[r].uv++;
+        if (timeSlotStats[t]) timeSlotStats[t].uv++;
+
+        const hasConverted = convertedUsers.has(sid);
+        const hasTrack1 = reserveUsers.has(sid);
+        const hasTrack2 = purchaseUsers.has(sid);
+
+        if (hasConverted) {
+          if (genderStats[g]) genderStats[g].converted++;
+          if (regionStats[r]) regionStats[r].converted++;
+          if (timeSlotStats[t]) timeSlotStats[t].converted++;
+        }
+        if (hasTrack1) {
+          if (genderStats[g]) genderStats[g].track1.converted++;
+          if (regionStats[r]) regionStats[r].track1.converted++;
+          if (timeSlotStats[t]) timeSlotStats[t].track1.converted++;
+        }
+        if (hasTrack2) {
+          if (genderStats[g]) genderStats[g].track2.converted++;
+          if (regionStats[r]) regionStats[r].track2.converted++;
+          if (timeSlotStats[t]) timeSlotStats[t].track2.converted++;
+        }
+      });
+
+      genders.forEach(g => {
+        const s = genderStats[g];
+        s.rate = calcRate(s.converted, s.uv);
+        s.track1.rate = calcRate(s.track1.converted, s.uv);
+        s.track2.rate = calcRate(s.track2.converted, s.uv);
+      });
+      regions.forEach(r => {
+        const s = regionStats[r];
+        s.rate = calcRate(s.converted, s.uv);
+        s.track1.rate = calcRate(s.track1.converted, s.uv);
+        s.track2.rate = calcRate(s.track2.converted, s.uv);
+      });
+      timeSlots.forEach(t => {
+        const s = timeSlotStats[t];
+        s.rate = calcRate(s.converted, s.uv);
+        s.track1.rate = calcRate(s.track1.converted, s.uv);
+        s.track2.rate = calcRate(s.track2.converted, s.uv);
+      });
+
+      const totalUV = visitors.size;
+      const reserveRate = calcRate(reserveUsers.size, totalUV);
+      const purchaseRate = calcRate(purchaseUsers.size, totalUV);
+      const totalConvertedUsers = convertedUsers.size;
+      const totalConversionRate = calcRate(totalConvertedUsers, totalUV);
+
+      const data = {
+        totalUV,
+        reserveClicks,
+        reserveRate,
+        purchaseClicks,
+        purchaseRate,
+        totalConvertedUsers,
+        totalConversionRate,
+        isHypothesisPassed: parseFloat(totalConversionRate) >= 10.0,
+        track1Stats: {
+          name: 'Track 1: 무료 사전알림',
+          price: '0원',
+          targetRate: 20.0,
+          clicks: reserveClicks,
+          convertedUsers: reserveUsers.size,
+          conversionRate: reserveRate,
+          isPassed: parseFloat(reserveRate) >= 20.0
+        },
+        track2Stats: {
+          name: 'Track 2: 얼리버드 테스터',
+          price: '5,900원',
+          targetRate: 5.0,
+          clicks: purchaseClicks,
+          convertedUsers: purchaseUsers.size,
+          conversionRate: purchaseRate,
+          isPassed: parseFloat(purchaseRate) >= 5.0
+        },
+        genderStats,
+        regionStats,
+        timeSlotStats,
+        recentLogs: logs.slice(-50).reverse()
+      };
+      cachedStats = data;
+      renderStats(data);
+    }
+
+    function renderStats(data) {
+      // 1. Overall Top KPI values
+      document.getElementById('statUV').textContent = data.totalUV;
+      document.getElementById('statReserveClicks').textContent = data.reserveClicks;
+      document.getElementById('statReserveRate').textContent = data.reserveRate + '%';
+      document.getElementById('statPurchaseClicks').textContent = data.purchaseClicks;
+      document.getElementById('statPurchaseRate').textContent = data.purchaseRate + '%';
+
+      // KPI Card Highlighting based on active track
+      const kpiT1 = document.getElementById('kpiCardTrack1');
+      const kpiT2 = document.getElementById('kpiCardTrack2');
+      const badgeT1 = document.getElementById('badgeT1Selected');
+      const badgeT2 = document.getElementById('badgeT2Selected');
+
+      if (currentTrackFilter === 'track1') {
+        kpiT1.className = 'bg-slate-900 p-6 rounded-2xl border border-sky-500 ring-2 ring-sky-500/20 shadow-lg transition-all cursor-pointer';
+        badgeT1.classList.remove('hidden');
+        kpiT2.className = 'bg-slate-900 p-6 rounded-2xl border border-slate-800 opacity-60 hover:opacity-100 shadow transition-all cursor-pointer hover:border-slate-700';
+        badgeT2.classList.add('hidden');
+      } else if (currentTrackFilter === 'track2') {
+        kpiT2.className = 'bg-slate-900 p-6 rounded-2xl border border-amber-500 ring-2 ring-amber-500/20 shadow-lg transition-all cursor-pointer';
+        badgeT2.classList.remove('hidden');
+        kpiT1.className = 'bg-slate-900 p-6 rounded-2xl border border-slate-800 opacity-60 hover:opacity-100 shadow transition-all cursor-pointer hover:border-slate-700';
+        badgeT1.classList.add('hidden');
+      } else {
+        kpiT1.className = 'bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow transition-all cursor-pointer hover:border-slate-700';
+        badgeT1.classList.add('hidden');
+        kpiT2.className = 'bg-slate-900 p-6 rounded-2xl border border-slate-800 shadow transition-all cursor-pointer hover:border-slate-700';
+        badgeT2.classList.add('hidden');
+      }
+
+      // 2. Hypothesis Status Banner
+      const subTitle = document.getElementById('hypothesisSubtitle');
+      const titleLabel = document.getElementById('hypothesisTitleLabel');
+      const rateText = document.getElementById('totalRateText');
+      const descText = document.getElementById('hypothesisDesc');
+      const badge = document.getElementById('validationBadge');
+      const progressBar = document.getElementById('conversionProgressBar');
+
+      if (currentTrackFilter === 'all') {
+        subTitle.textContent = 'XYZ 가설 검증 기준 판정 (전체 통합 · 실증 목표 기준 X = 10%)';
+        subTitle.className = 'text-xs font-mono font-bold text-teal-400 uppercase tracking-wider mb-1';
+        titleLabel.textContent = '종합 클릭 전환율:';
+        rateText.textContent = data.totalConversionRate + '%';
+        rateText.className = 'text-teal-400 font-mono font-black';
+        descText.textContent = '"전체 고유 방문자 대비 적어도 10% 이상이 사전등록(0원) 또는 테스터 구매(5,900원) 버튼을 클릭하면 가설 통과(될 놈)."';
+
+        const rateNum = Math.min(parseFloat(data.totalConversionRate || 0), 100);
+        progressBar.style.width = rateNum + '%';
+
+        if (data.totalUV === 0) {
+          badge.className = 'text-xs px-3.5 py-1 rounded-full bg-slate-800 text-slate-300 font-bold border border-slate-700';
+          badge.textContent = '실증 데이터 수집 대기';
+          progressBar.className = 'bg-slate-700 h-full rounded-full transition-all duration-700';
+        } else if (data.isHypothesisPassed) {
+          badge.className = 'text-xs px-3.5 py-1 rounded-full bg-teal-500/20 text-teal-300 font-black border border-teal-500/50 font-mono';
+          badge.textContent = '✅ 종합 가설 통과 (The Right It)';
+          progressBar.className = 'bg-teal-500 h-full rounded-full transition-all duration-700';
+        } else {
+          badge.className = 'text-xs px-3.5 py-1 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/50 font-mono';
+          badge.textContent = `⏳ 실증 진행 중 (${data.totalConversionRate}% / 10%)`;
+          progressBar.className = 'bg-amber-500 h-full rounded-full transition-all duration-700';
+        }
+      } else if (currentTrackFilter === 'track1') {
+        subTitle.textContent = '🥈 Track 1 사전등록 가설 검증 (무료 사전알림 0원 · 목표 기준 X = 20%)';
+        subTitle.className = 'text-xs font-mono font-bold text-sky-400 uppercase tracking-wider mb-1';
+        titleLabel.textContent = 'Track 1 전환율:';
+        rateText.textContent = data.reserveRate + '%';
+        rateText.className = 'text-sky-400 font-mono font-black';
+        descText.textContent = '"비용 부담이 없는 무료 사전알림(0원)에 전체 방문자의 20% 이상이 신청하면 잠재 수요 실증 통과."';
+
+        const rateNum = Math.min(parseFloat(data.reserveRate || 0), 100);
+        progressBar.style.width = rateNum + '%';
+
+        const t1Passed = parseFloat(data.reserveRate || 0) >= 20.0;
+        if (data.totalUV === 0) {
+          badge.className = 'text-xs px-3.5 py-1 rounded-full bg-slate-800 text-slate-300 font-bold border border-slate-700';
+          badge.textContent = '실증 데이터 수집 대기';
+          progressBar.className = 'bg-slate-700 h-full rounded-full transition-all duration-700';
+        } else if (t1Passed) {
+          badge.className = 'text-xs px-3.5 py-1 rounded-full bg-sky-500/20 text-sky-300 font-black border border-sky-500/50 font-mono';
+          badge.textContent = '✅ Track 1 목표 달성 (20% 초과)';
+          progressBar.className = 'bg-sky-500 h-full rounded-full transition-all duration-700';
+        } else {
+          badge.className = 'text-xs px-3.5 py-1 rounded-full bg-sky-500/20 text-sky-300 font-bold border border-sky-500/50 font-mono';
+          badge.textContent = `⏳ Track 1 실증 중 (${data.reserveRate}% / 20%)`;
+          progressBar.className = 'bg-sky-400 h-full rounded-full transition-all duration-700';
+        }
+      } else if (currentTrackFilter === 'track2') {
+        subTitle.textContent = '🥇 Track 2 실 결제의사 검증 (얼리버드 테스터 5,900원 · 목표 기준 X = 5%)';
+        subTitle.className = 'text-xs font-mono font-bold text-amber-400 uppercase tracking-wider mb-1';
+        titleLabel.textContent = 'Track 2 전환율:';
+        rateText.textContent = data.purchaseRate + '%';
+        rateText.className = 'text-amber-400 font-mono font-black';
+        descText.textContent = '"실제 5,900원 유료 결제 의사(Skin-in-the-game)를 가진 테스터가 전체 방문자의 5% 이상이면 유료 사업성 통과."';
+
+        const rateNum = Math.min(parseFloat(data.purchaseRate || 0), 100);
+        progressBar.style.width = rateNum + '%';
+
+        const t2Passed = parseFloat(data.purchaseRate || 0) >= 5.0;
+        if (data.totalUV === 0) {
+          badge.className = 'text-xs px-3.5 py-1 rounded-full bg-slate-800 text-slate-300 font-bold border border-slate-700';
+          badge.textContent = '실증 데이터 수집 대기';
+          progressBar.className = 'bg-slate-700 h-full rounded-full transition-all duration-700';
+        } else if (t2Passed) {
+          badge.className = 'text-xs px-3.5 py-1 rounded-full bg-amber-500/20 text-amber-300 font-black border border-amber-500/50 font-mono';
+          badge.textContent = '✅ Track 2 목표 달성 (Skin-in-the-game 입증)';
+          progressBar.className = 'bg-amber-500 h-full rounded-full transition-all duration-700';
+        } else {
+          badge.className = 'text-xs px-3.5 py-1 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/50 font-mono';
+          badge.textContent = `⏳ Track 2 실증 중 (${data.purchaseRate}% / 5%)`;
+          progressBar.className = 'bg-amber-400 h-full rounded-full transition-all duration-700';
+        }
+      }
+
+      // Track Label Badges in Section Headers
+      const trackBadgeText = currentTrackFilter === 'all'
+        ? '(전체 통합)'
+        : currentTrackFilter === 'track1'
+          ? '(Track 1: 무료 사전알림 0원)'
+          : '(Track 2: 테스터 5,900원)';
+      document.getElementById('genderTrackLabel').textContent = trackBadgeText;
+      document.getElementById('regionTrackLabel').textContent = trackBadgeText;
+      document.getElementById('timeSlotTrackLabel').textContent = trackBadgeText;
+
+      // Helper function for metric display
+      function getMetric(item) {
+        if (!item) return { uv: 0, converted: 0, rate: '0.0', label: '0명 중 0명', barColor: 'bg-teal-500' };
+        if (currentTrackFilter === 'track1') {
+          const t1 = item.track1 || { converted: 0, rate: '0.0' };
+          return { uv: item.uv, converted: t1.converted, rate: t1.rate, label: `${item.uv}명 중 ${t1.converted}명 신청`, barColor: 'bg-sky-500' };
+        } else if (currentTrackFilter === 'track2') {
+          const t2 = item.track2 || { converted: 0, rate: '0.0' };
+          return { uv: item.uv, converted: t2.converted, rate: t2.rate, label: `${item.uv}명 중 ${t2.converted}명 구매`, barColor: 'bg-amber-500' };
+        } else {
+          return { uv: item.uv, converted: item.converted, rate: item.rate, label: `${item.uv}명 중 ${item.converted}명 클릭`, barColor: 'bg-teal-500' };
+        }
+      }
+
+      function renderSubTrackHtml(it) {
+        const t1 = it?.track1 || { converted: 0, rate: '0.0' };
+        const t2 = it?.track2 || { converted: 0, rate: '0.0' };
+        const t1Class = currentTrackFilter === 'track1' ? 'text-sky-300 font-black underline' : 'text-sky-400 font-bold';
+        const t2Class = currentTrackFilter === 'track2' ? 'text-amber-300 font-black underline' : 'text-amber-400 font-bold';
+        return `
+          <span>🥈 T1: <b class="${t1Class}">${t1.rate}%</b> (${t1.converted}명)</span>
+          <span>🥇 T2: <b class="${t2Class}">${t2.rate}%</b> (${t2.converted}명)</span>
+        `;
+      }
+
+      // 3. Gender Demographic Section
+      const gs = data.genderStats || {};
+      if (gs['남성']) {
+        const m = getMetric(gs['남성']);
+        document.getElementById('maleRate').textContent = m.rate + '%';
+        document.getElementById('maleCounts').textContent = m.label;
+        const bar = document.getElementById('maleBar');
+        bar.style.width = Math.min(parseFloat(m.rate), 100) + '%';
+        bar.className = `${m.barColor} h-full rounded-full transition-all duration-500`;
+        document.getElementById('maleTrackSub').innerHTML = renderSubTrackHtml(gs['남성']);
+      }
+      if (gs['여성']) {
+        const f = getMetric(gs['여성']);
+        document.getElementById('femaleRate').textContent = f.rate + '%';
+        document.getElementById('femaleCounts').textContent = f.label;
+        const bar = document.getElementById('femaleBar');
+        bar.style.width = Math.min(parseFloat(f.rate), 100) + '%';
+        bar.className = `${currentTrackFilter === 'track2' ? 'bg-amber-500' : 'bg-sky-500'} h-full rounded-full transition-all duration-500`;
+        document.getElementById('femaleTrackSub').innerHTML = renderSubTrackHtml(gs['여성']);
+      }
+      if (gs['무성별']) {
+        const n = getMetric(gs['무성별']);
+        document.getElementById('nonbinaryRate').textContent = n.rate + '%';
+        document.getElementById('nonbinaryCounts').textContent = n.label;
+        const bar = document.getElementById('nonbinaryBar');
+        bar.style.width = Math.min(parseFloat(n.rate), 100) + '%';
+        bar.className = `${currentTrackFilter === 'track1' ? 'bg-sky-500' : 'bg-amber-500'} h-full rounded-full transition-all duration-500`;
+        document.getElementById('nonbinaryTrackSub').innerHTML = renderSubTrackHtml(gs['무성별']);
+      }
+
+      // 4. Region Demographic Section (서울, 5도, 이세계)
+      const rs = data.regionStats || {};
+      const regionGrid = document.getElementById('regionCardsGrid');
+      const regionNames = ['서울', '경기도', '강원도', '충청도', '전라도', '경상도', '이세계'];
+      
+      regionGrid.innerHTML = regionNames.map(rName => {
+        const item = rs[rName] || { uv: 0, converted: 0, rate: '0.0', track1: { converted: 0, rate: '0.0' }, track2: { converted: 0, rate: '0.0' } };
+        const m = getMetric(item);
+        const t1 = item.track1 || { converted: 0, rate: '0.0' };
+        const t2 = item.track2 || { converted: 0, rate: '0.0' };
+        const t1Class = currentTrackFilter === 'track1' ? 'text-sky-300 font-black underline' : 'text-sky-400 font-bold';
+        const t2Class = currentTrackFilter === 'track2' ? 'text-amber-300 font-black underline' : 'text-amber-400 font-bold';
+        const rateColor = currentTrackFilter === 'track1' ? 'text-sky-300' : currentTrackFilter === 'track2' ? 'text-amber-300' : 'text-teal-300';
+        return `
+          <div class="bg-slate-950 p-4 rounded-2xl border border-slate-800 shadow">
+            <div class="text-xs font-sans font-bold text-slate-300 mb-1">${rName}</div>
+            <div class="text-lg font-black ${rateColor}">${m.rate}%</div>
+            <div class="text-[11px] text-slate-300 mt-0.5">${m.label}</div>
+            <div class="text-[10px] text-slate-400 mt-2 pt-1.5 border-t border-slate-800/80 flex justify-between font-mono">
+              <span>T1: <b class="${t1Class}">${t1.rate}%</b></span>
+              <span>T2: <b class="${t2Class}">${t2.rate}%</b></span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // 5. TimeSlot Demographic Section (아침, 점심, 저녁)
+      const ts = data.timeSlotStats || {};
+      if (ts['아침']) {
+        const morn = getMetric(ts['아침']);
+        document.getElementById('morningRate').textContent = morn.rate + '%';
+        document.getElementById('morningCounts').textContent = morn.label;
+        const bar = document.getElementById('morningBar');
+        bar.style.width = Math.min(parseFloat(morn.rate), 100) + '%';
+        bar.className = `${morn.barColor} h-full rounded-full transition-all duration-500`;
+        document.getElementById('morningTrackSub').innerHTML = renderSubTrackHtml(ts['아침']);
+      }
+      if (ts['점심']) {
+        const lun = getMetric(ts['점심']);
+        document.getElementById('lunchRate').textContent = lun.rate + '%';
+        document.getElementById('lunchCounts').textContent = lun.label;
+        const bar = document.getElementById('lunchBar');
+        bar.style.width = Math.min(parseFloat(lun.rate), 100) + '%';
+        bar.className = `${lun.barColor} h-full rounded-full transition-all duration-500`;
+        document.getElementById('lunchTrackSub').innerHTML = renderSubTrackHtml(ts['점심']);
+      }
+      if (ts['저녁']) {
+        const eve = getMetric(ts['저녁']);
+        document.getElementById('eveningRate').textContent = eve.rate + '%';
+        document.getElementById('eveningCounts').textContent = eve.label;
+        const bar = document.getElementById('eveningBar');
+        bar.style.width = Math.min(parseFloat(eve.rate), 100) + '%';
+        bar.className = `${eve.barColor} h-full rounded-full transition-all duration-500`;
+        document.getElementById('eveningTrackSub').innerHTML = renderSubTrackHtml(ts['저녁']);
+      }
+
+      // 6. Raw Logs Telemetry Stream
+      const logBadge = document.getElementById('logFilterBadge');
+      let filteredLogs = data.recentLogs || [];
+      if (currentTrackFilter === 'track1') {
+        filteredLogs = filteredLogs.filter(l => l.eventType === 'click_reserve');
+        logBadge.textContent = '🥈 Track 1 (사전알림 0원) 로그만 표시';
+        logBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-sky-950 text-sky-300 font-mono font-bold border border-sky-800';
+      } else if (currentTrackFilter === 'track2') {
+        filteredLogs = filteredLogs.filter(l => l.eventType === 'click_purchase');
+        logBadge.textContent = '🥇 Track 2 (테스터 5,900원) 로그만 표시';
+        logBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-amber-950 text-amber-300 font-mono font-bold border border-amber-800';
+      } else {
+        logBadge.textContent = '전체 로그';
+        logBadge.className = 'text-[10px] px-2 py-0.5 rounded bg-teal-950 text-teal-300 font-mono font-bold border border-teal-800';
+      }
+
+      const logTbody = document.getElementById('logTableBody');
+      if (!filteredLogs || filteredLogs.length === 0) {
+        const filterMsg = currentTrackFilter === 'track1'
+          ? '기록된 Track 1(사전알림) 이벤트가 없습니다.'
+          : currentTrackFilter === 'track2'
+            ? '기록된 Track 2(테스터 구매) 이벤트가 없습니다.'
+            : '기록된 이벤트가 없습니다.';
+        logTbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-slate-400 font-sans">${filterMsg}</td></tr>`;
+      } else {
+        logTbody.innerHTML = filteredLogs.map(l => {
+          const timeStr = l.timestamp ? new Date(l.timestamp).toLocaleTimeString() : '-';
+          let eventBadge = '';
+          if (l.eventType === 'page_view') eventBadge = '<span class="text-slate-300 font-medium">입장(PAGE_VIEW)</span>';
+          else if (l.eventType === 'click_reserve') eventBadge = '<span class="text-sky-400 font-bold">🥈 Track 1 사전알림 클릭</span>';
+          else if (l.eventType === 'click_purchase') eventBadge = '<span class="text-amber-400 font-bold">🥇 Track 2 테스터(5,900원) 클릭</span>';
+          else eventBadge = `<span>${l.eventType}</span>`;
+
+          const adminTag = l.isAdmin ? ' <span class="text-[10px] text-amber-400 bg-amber-950 px-1.5 py-0.5 rounded border border-amber-800">[관리자]</span>' : '';
+
+          return `
+            <tr class="hover:bg-slate-850">
+              <td class="py-3 px-4 text-slate-400 whitespace-nowrap">${timeStr}</td>
+              <td class="py-3 px-4">${eventBadge}${adminTag}</td>
+              <td class="py-3 px-4 font-bold text-white font-sans">${l.gender || '-'}</td>
+              <td class="py-3 px-4 text-teal-300 font-sans">${l.region || '-'}</td>
+              <td class="py-3 px-4 text-amber-300 font-sans font-bold">${l.timeSlot || '-'}</td>
+              <td class="py-3 px-4 text-slate-300">${l.device || '-'}</td>
+              <td class="py-3 px-4 text-slate-400 text-[11px]">${l.sessionId || '-'}</td>
+            </tr>
+          `;
+        }).join('');
+      }
+    }
+
+    function downloadCsv() {
+      window.location.href = '/api/export-csv';
+    }
+
+    async function resetDataImmediately() {
+      const ok = confirm("⚠️ [경고: 데이터 완전 초기화]\n\n현재까지 수집된 모든 방문자(UV) 및 클릭 데이터를 삭제하고 0으로 리셋하시겠습니까?\n(실증 배포 전 테스트 기록을 지울 때 사용하세요.)");
+      if (!ok) return;
+
+      try {
+        const res = await fetch('/api/reset', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pin: '1234' })
+        });
+        localStorage.removeItem('arest_local_logs');
+        alert('✅ 모든 데이터가 0으로 깨끗하게 초기화되었습니다.');
+        fetchStats();
+      } catch (e) {
+        localStorage.removeItem('arest_local_logs');
+        alert('✅ 로컬 데이터가 0으로 초기화되었습니다.');
+        fetchStats();
+      }
+    }
+
+    function toggleAdminFilter() {
+      const current = localStorage.getItem('arest_is_admin_device') === 'true';
+      const nextState = !current;
+      localStorage.setItem('arest_is_admin_device', String(nextState));
+      updateFilterButtonUI();
+
+      if (nextState) {
+        alert('🛡️ [내 방문 집계 제외: 활성화]\n이제 본인 기기에서 랜딩페이지를 열람하거나 버튼을 눌러도 통계(UV, 클릭수)에 전혀 반영되지 않습니다.');
+      } else {
+        alert('⚠️ [내 방문 집계 제외: 해제]\n이제 본인 기기의 접속도 일반 방문자처럼 통계에 반영됩니다.');
+      }
+    }
+
+    function updateFilterButtonUI() {
+      const isExcluded = localStorage.getItem('arest_is_admin_device') === 'true';
+      const textSpan = document.getElementById('adminFilterText');
+      const btn = document.getElementById('adminFilterToggleBtn');
+      if (textSpan && btn) {
+        if (isExcluded) {
+          textSpan.textContent = '내 방문 집계 제외: ON';
+          btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-800 border border-teal-800 text-xs font-semibold text-teal-300 flex items-center space-x-1.5 transition';
+        } else {
+          textSpan.textContent = '내 방문 집계 제외: OFF';
+          btn.className = 'px-2.5 sm:px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-400 flex items-center space-x-1.5 transition';
+        }
+      }
+    }
+
+    checkAuth();
+  </script>
+</body>
+</html>
