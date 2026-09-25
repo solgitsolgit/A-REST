@@ -438,32 +438,32 @@
       <div class="mb-5">
         <div class="flex items-center justify-between mb-2">
           <label id="infoRegionLabel" class="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
-            2. Campus Region / State
+            2. Country / Region
           </label>
           <span id="infoRegionNotice" class="text-[11px] text-teal-400 font-mono font-medium">Required</span>
         </div>
         <div id="regionButtonsContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs sm:text-sm font-medium">
-          <!-- Dynamically Rendered -->
+          <!-- Dynamically Rendered: US, China, 5 Continents -->
         </div>
       </div>
 
-      <!-- 3. Preferred Rest Time Selection -->
-      <div class="mb-7">
+      <!-- 3. University / College (Optional) -->
+      <div class="mb-6">
         <div class="flex items-center justify-between mb-2">
-          <label id="infoTimeLabel" class="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
-            3. Preferred Rest Time
+          <label id="infoUnivLabel" for="userUniversityInput" class="text-xs font-bold text-slate-300 uppercase tracking-wider font-mono">
+            3. University / College
           </label>
-          <span id="infoTimeNotice" class="text-[11px] text-teal-400 font-mono font-medium">Required</span>
+          <span id="infoUnivNotice" class="text-[11px] text-teal-400 font-mono font-medium">Optional</span>
         </div>
-        <div id="timeButtonsContainer" class="grid grid-cols-3 gap-2.5">
-          <!-- Dynamically Rendered -->
-        </div>
+        <input type="text" id="userUniversityInput" maxlength="100"
+          placeholder="e.g. Stanford University, UCLA, Peking University..."
+          class="w-full bg-slate-950 border border-slate-700 rounded-xl px-4 py-3 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-teal-400 transition font-sans" />
       </div>
 
       <!-- Submit button -->
       <button type="button" id="submitInfoBtn" onclick="submitInfoAndReveal()" disabled
         class="w-full py-4 rounded-xl bg-slate-800 text-slate-400 font-bold text-sm tracking-wider uppercase transition cursor-not-allowed">
-        Please select all options
+        Please select gender and region
       </button>
     </div>
   </div>
@@ -592,13 +592,15 @@
         modalTitleReserve: 'Participant Registration',
         modalBadgePurchase: 'Track 2 · 30-Min Deep Rest Session ($4.99)',
         modalTitlePurchase: 'Tester Session Entry',
-        modalDesc: 'Please choose your preferences below for scheduling and dispatch notifications.',
+        modalDesc: 'Please choose your preferences below for pilot participation and dispatch notifications.',
         genderLabel: '1. Gender',
-        regionLabel: '2. Campus Region / State',
-        timeLabel: '3. Preferred Rest Time',
+        regionLabel: '2. Country / Region',
+        univLabel: '3. University / College',
+        univOptional: 'Optional',
+        univPlaceholder: 'e.g. Stanford University, UCLA, Peking University...',
         needSelect: 'Required',
         btnSubmitReady: 'Confirm & Proceed',
-        btnSubmitDisabled: 'Please select all options',
+        btnSubmitDisabled: 'Please select gender and region',
         revealTitle: '"Thank you! We\'re launching soon."',
         revealDesc: 'This is an academic research prototype by university students to test demand. We are currently finalizing the autonomous rest pod for official campus deployment!',
         feedbackPromptTitle: 'Message to the Research Team (Feedback / Suggestions)',
@@ -607,20 +609,18 @@
         revealCompleteBtn: 'Done',
         adminBadgeText: 'Admin Device (Stats Excluded)',
         genders: [
-          { id: 'male_en', label: 'Male' },
-          { id: 'female_en', label: 'Female' }
+          { id: 'male', label: 'Male' },
+          { id: 'female', label: 'Female' }
         ],
         regions: [
-          { id: 'west', label: 'West Coast' },
-          { id: 'northeast', label: 'Northeast' },
-          { id: 'midwest', label: 'Midwest' },
-          { id: 'south', label: 'South' },
-          { id: 'other_en', label: 'Other / Global' }
-        ],
-        timeSlots: [
-          { id: 'morning_en', icon: '🌅', label: 'Morning', time: '07–11 AM' },
-          { id: 'afternoon_en', icon: '☀️', label: 'Midday', time: '11 AM–5 PM' },
-          { id: 'evening_en', icon: '🌙', label: 'Evening', time: '5–11 PM' }
+          { id: 'us', label: 'United States' },
+          { id: 'cn', label: 'China' },
+          { id: 'asia', label: 'Asia (Other)' },
+          { id: 'europe', label: 'Europe' },
+          { id: 'north_america', label: 'North America (Other)' },
+          { id: 'south_america', label: 'South America' },
+          { id: 'oceania', label: 'Oceania' },
+          { id: 'africa', label: 'Africa' }
         ]
       },
       zh: {
@@ -697,13 +697,15 @@
         modalTitleReserve: '填写实测参与信息',
         modalBadgePurchase: 'Track 2 · 30分钟深度休息体验 (¥29)',
         modalTitlePurchase: '体验官报名信息填写',
-        modalDesc: '请选择以下信息，以便为您安排预约与到站提醒。',
+        modalDesc: '请填写以下信息，以便为您安排参与体验及校园停靠日程通知。',
         genderLabel: '1. 性别',
-        regionLabel: '2. 所在地区 / 城市',
-        timeLabel: '3. 期望使用时段',
+        regionLabel: '2. 居住 / 就读地区',
+        univLabel: '3. 就读大学 / 院校',
+        univOptional: '选填',
+        univPlaceholder: '例如：清华大学、北京大学、Stanford、UCLA等...',
         needSelect: '必选',
         btnSubmitReady: '确认',
-        btnSubmitDisabled: '请选择所有选项',
+        btnSubmitDisabled: '请选择性别与所在地区',
         revealTitle: '"感谢关注！项目正在积极筹备中。"',
         revealDesc: '本页面为大学团队用于验证真实需求的原型测试。我们正在全力筹备更高完成度的校园自动驾驶智慧休息舱！',
         feedbackPromptTitle: '给研发团队留言（建议 / 期待）',
@@ -712,20 +714,18 @@
         revealCompleteBtn: '完成',
         adminBadgeText: '管理员设备 (不计入统计)',
         genders: [
-          { id: 'male_zh', label: '男 (Male)' },
-          { id: 'female_zh', label: '女 (Female)' }
+          { id: 'male', label: '男 (Male)' },
+          { id: 'female', label: '女 (Female)' }
         ],
         regions: [
-          { id: 'huadong', label: '华东 (沪/苏/浙等)' },
-          { id: 'huabei', label: '华北 (京/津/冀等)' },
-          { id: 'huanan', label: '华南 (粤/闽等)' },
-          { id: 'xinan_huazhong', label: '华中 / 西南' },
-          { id: 'other_zh', label: '其他 / 海外' }
-        ],
-        timeSlots: [
-          { id: 'morning_zh', icon: '🌅', label: '早晨', time: '07~11点' },
-          { id: 'afternoon_zh', icon: '☀️', label: '下午', time: '11~17点' },
-          { id: 'evening_zh', icon: '🌙', label: '晚间', time: '17~23点' }
+          { id: 'us', label: '美国 (United States)' },
+          { id: 'cn', label: '中国 (China)' },
+          { id: 'asia', label: '亚洲 (其他地区)' },
+          { id: 'europe', label: '欧洲 (Europe)' },
+          { id: 'north_america', label: '北美 (其他地区)' },
+          { id: 'south_america', label: '南美 (South America)' },
+          { id: 'oceania', label: '大洋洲 (Oceania)' },
+          { id: 'africa', label: '非洲 (Africa)' }
         ]
       },
       ko: {
@@ -802,13 +802,15 @@
         modalTitleReserve: '실증 알림 정보 입력',
         modalBadgePurchase: 'Track 2 · 30분 집중 휴식 세션 테스터 (5,900원)',
         modalTitlePurchase: '테스터 참여 정보 입력',
-        modalDesc: '선택하신 세션 신청 및 배차 알림을 위해 아래 정보를 선택해 주세요.',
+        modalDesc: '실증 참여 및 캠퍼스 배차 알림을 위해 아래 정보를 입력해 주세요.',
         genderLabel: '1. 성별',
         regionLabel: '2. 거주 / 활동 지역',
-        timeLabel: '3. 희망 이용 시간대',
+        univLabel: '3. 소속 대학교',
+        univOptional: '선택 사항',
+        univPlaceholder: '예: 서울대, 연세대, 고려대, Stanford, UCLA 등...',
         needSelect: '선택 필요',
         btnSubmitReady: '확인',
-        btnSubmitDisabled: '항목을 모두 선택해 주세요',
+        btnSubmitDisabled: '성별과 거주 지역을 선택해 주세요',
         revealTitle: '"죄송합니다! 준비중입니다. ㅎㅎ"',
         revealDesc: '더 완성도 높은 자율주행 스마트 휴식 모빌리티를 준비하여 찾아뵙겠습니다.',
         feedbackPromptTitle: '제작자에게 하고 싶은 말 (응원 / 의견 / 건의)',
@@ -817,21 +819,18 @@
         revealCompleteBtn: '완료',
         adminBadgeText: '관리자 기기 (통계 집계 제외 모드)',
         genders: [
-          { id: 'male_ko', label: '남성' },
-          { id: 'female_ko', label: '여성' }
+          { id: 'male', label: '남성' },
+          { id: 'female', label: '여성' }
         ],
         regions: [
-          { id: 'seoul', label: '서울' },
-          { id: 'gyeonggi', label: '경기도' },
-          { id: 'gangwon', label: '강원도' },
-          { id: 'chungcheong', label: '충청도' },
-          { id: 'jeolla', label: '전라도' },
-          { id: 'gyeongsang', label: '경상도' }
-        ],
-        timeSlots: [
-          { id: 'morning_ko', icon: '🌅', label: '아침', time: '07~11시' },
-          { id: 'afternoon_ko', icon: '☀️', label: '점심', time: '11~17시' },
-          { id: 'evening_ko', icon: '🌙', label: '저녁', time: '17~23시' }
+          { id: 'us', label: '미국' },
+          { id: 'cn', label: '중국' },
+          { id: 'asia', label: '아시아 (기타)' },
+          { id: 'europe', label: '유럽' },
+          { id: 'north_america', label: '북미 (기타)' },
+          { id: 'south_america', label: '남미' },
+          { id: 'oceania', label: '오세아니아' },
+          { id: 'africa', label: '아프리카' }
         ]
       }
     };
@@ -840,10 +839,9 @@
     let currentTrack = null;
     let selectedGender = sessionStorage.getItem('arest_user_gender') || null;
     let selectedRegion = sessionStorage.getItem('arest_user_region') || null;
-    let selectedTimeSlot = sessionStorage.getItem('arest_user_timeslot') || null;
+    let selectedUniversity = sessionStorage.getItem('arest_user_university') || '';
     let selectedGenderId = sessionStorage.getItem('arest_user_gender_id') || null;
     let selectedRegionId = sessionStorage.getItem('arest_user_region_id') || null;
-    let selectedTimeSlotId = sessionStorage.getItem('arest_user_timeslot_id') || null;
 
     function getSessionId() {
       let sid = localStorage.getItem('arest_session_id');
@@ -967,7 +965,44 @@
       setText('infoModalDesc', t.modalDesc);
       setText('infoGenderLabel', t.genderLabel);
       setText('infoRegionLabel', t.regionLabel);
-      setText('infoTimeLabel', t.timeLabel);
+      setText('infoUnivLabel', t.univLabel);
+      setText('infoUnivNotice', t.univOptional);
+      const univInput = document.getElementById('userUniversityInput');
+      if (univInput) {
+        univInput.placeholder = t.univPlaceholder;
+      }
+
+      // 성별/지역 선택 상태 텍스트 갱신
+      if (selectedGenderId) {
+        const item = t.genders.find(g => g.id === selectedGenderId);
+        if (item) {
+          selectedGender = item.label;
+          const notice = document.getElementById('infoGenderNotice');
+          if (notice) notice.textContent = '✓ ' + selectedGender;
+        }
+      } else {
+        const notice = document.getElementById('infoGenderNotice');
+        if (notice) notice.textContent = t.needSelect;
+      }
+
+      if (selectedRegionId) {
+        const item = t.regions.find(r => r.id === selectedRegionId);
+        if (item) {
+          selectedRegion = item.label;
+          const notice = document.getElementById('infoRegionNotice');
+          if (notice) notice.textContent = '✓ ' + selectedRegion;
+        } else {
+          selectedRegionId = null;
+          selectedRegion = null;
+          sessionStorage.removeItem('arest_user_region_id');
+          sessionStorage.removeItem('arest_user_region');
+          const notice = document.getElementById('infoRegionNotice');
+          if (notice) notice.textContent = t.needSelect;
+        }
+      } else {
+        const notice = document.getElementById('infoRegionNotice');
+        if (notice) notice.textContent = t.needSelect;
+      }
 
       setText('revealTitle', t.revealTitle);
       setText('revealDesc', t.revealDesc);
@@ -1023,21 +1058,9 @@
         `).join('');
       }
 
-      // 3. 시간대 버튼
-      const timeContainer = document.getElementById('timeButtonsContainer');
-      if (timeContainer) {
-        timeContainer.innerHTML = t.timeSlots.map(ts => `
-          <button type="button" onclick="selectTimeSlot('${ts.id}')" id="info-time-${ts.id}"
-            class="time-btn py-3 rounded-xl bg-slate-950 border border-slate-800 text-xs sm:text-sm font-bold text-slate-200 hover:border-teal-500/60 transition text-center shadow-sm cursor-pointer">
-            ${ts.icon} ${ts.label} <span class="block text-[10px] font-normal text-slate-400 font-mono mt-0.5">${ts.time}</span>
-          </button>
-        `).join('');
-      }
-
       // 기존 선택 복원
       if (selectedGenderId) highlightSelected('gender', selectedGenderId);
       if (selectedRegionId) highlightSelected('region', selectedRegionId);
-      if (selectedTimeSlotId) highlightSelected('time', selectedTimeSlotId);
     }
 
     // 모달 오픈 핸들러
@@ -1055,6 +1078,12 @@
         if (title) title.textContent = t.modalTitlePurchase;
       }
 
+      // 기존 입력 대학명 복원
+      const univInput = document.getElementById('userUniversityInput');
+      if (univInput && selectedUniversity) {
+        univInput.value = selectedUniversity;
+      }
+
       checkInfoReady();
       document.getElementById('infoModal').classList.remove('hidden');
     }
@@ -1069,6 +1098,7 @@
       selectedGender = item ? item.label : id;
       selectedGenderId = id;
       sessionStorage.setItem('arest_user_gender_id', id);
+      sessionStorage.setItem('arest_user_gender', selectedGender);
       highlightSelected('gender', id);
       const notice = document.getElementById('infoGenderNotice');
       if (notice) notice.textContent = '✓ ' + selectedGender;
@@ -1081,21 +1111,10 @@
       selectedRegion = item ? item.label : id;
       selectedRegionId = id;
       sessionStorage.setItem('arest_user_region_id', id);
+      sessionStorage.setItem('arest_user_region', selectedRegion);
       highlightSelected('region', id);
       const notice = document.getElementById('infoRegionNotice');
       if (notice) notice.textContent = '✓ ' + selectedRegion;
-      checkInfoReady();
-    }
-
-    // 시간대 선택
-    function selectTimeSlot(id) {
-      const item = I18N[currentLang].timeSlots.find(ts => ts.id === id);
-      selectedTimeSlot = item ? item.label : id;
-      selectedTimeSlotId = id;
-      sessionStorage.setItem('arest_user_timeslot_id', id);
-      highlightSelected('time', id);
-      const notice = document.getElementById('infoTimeNotice');
-      if (notice) notice.textContent = '✓ ' + selectedTimeSlot;
       checkInfoReady();
     }
 
@@ -1111,11 +1130,11 @@
       }
     }
 
-    // 3개 항목 모두 선택 확인
+    // 필수 항목(성별, 거주 지역) 선택 확인 (대학은 선택 사항)
     function checkInfoReady() {
       const btn = document.getElementById('submitInfoBtn');
       const t = I18N[currentLang];
-      if (selectedGender && selectedRegion && selectedTimeSlot) {
+      if (selectedGender && selectedRegion) {
         btn.disabled = false;
         btn.className = 'w-full py-4 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-black text-sm tracking-wider uppercase transition cursor-pointer shadow-lg shadow-teal-500/25';
         btn.textContent = t.btnSubmitReady;
@@ -1128,19 +1147,22 @@
 
     // 모달에서 확인 클릭 시
     function submitInfoAndReveal() {
-      if (!selectedGender || !selectedRegion || !selectedTimeSlot) return;
+      if (!selectedGender || !selectedRegion) return;
+
+      const univInput = document.getElementById('userUniversityInput');
+      selectedUniversity = univInput ? univInput.value.trim() : '';
 
       closeInfoModal();
       document.getElementById('revealModal').classList.remove('hidden');
 
       sessionStorage.setItem('arest_user_gender', selectedGender);
       sessionStorage.setItem('arest_user_region', selectedRegion);
-      sessionStorage.setItem('arest_user_timeslot', selectedTimeSlot);
+      sessionStorage.setItem('arest_user_university', selectedUniversity);
 
       const track = currentTrack;
       const gender = selectedGender;
       const region = selectedRegion;
-      const timeSlot = selectedTimeSlot;
+      const university = selectedUniversity;
       const eventName = track === 'reserve' ? 'click_reserve' : 'click_purchase';
 
       setTimeout(function() {
@@ -1148,7 +1170,8 @@
           button: track,
           gender: gender,
           region: region,
-          timeSlot: timeSlot,
+          university: university,
+          timeSlot: 'Unspecified',
           lang: currentLang
         });
       }, 0);
@@ -1182,7 +1205,8 @@
         lang: currentLang,
         gender: selectedGender || 'Unspecified',
         region: selectedRegion || 'Unspecified',
-        timeSlot: selectedTimeSlot || 'Unspecified',
+        university: selectedUniversity || details.university || '',
+        timeSlot: 'Unspecified',
         device: isMobile ? 'Mobile' : 'Desktop',
         durationSec: Math.round((Date.now() - pageLoadTime) / 1000),
         referrer: document.referrer || 'Direct/Community',
